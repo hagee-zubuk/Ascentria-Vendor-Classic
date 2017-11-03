@@ -30,7 +30,8 @@ Function GetClass2(xxx)
 End function
 ValidAko = False
 Set rsUser = Server.CreateObject("ADODB.RecordSet")
-sqlUser = "SELECT * FROM User_t WHERE upper([User]) = '" & UCase(Request("txtUN")) & "' "
+strUName = UCase(Z_CleanName(Request("txtUN")))	' avoid sql injection
+sqlUser = "SELECT * FROM User_t WHERE upper([User]) = '" & strUName & "' "
 rsUser.Open sqlUser, g_strCONN, 3, 1
 response.write sqlUser
 If Not rsUser.EOF Then
@@ -39,6 +40,12 @@ If Not rsUser.EOF Then
 		Session("UID") =  rsUser("index")
 		Session("GreetMe") = rsUser("lname")
 		If rsUser("fname") <> "" Then Session("GreetMe") = Session("GreetMe") & ",  " & rsUser("fname")
+		' WHAT DO THESE TYPES MEAN?? 
+		' 2 is admin
+		' 3 looks like hmo/hospitals
+		' 4 looks like courts
+		' 5 are nh public defenders
+		' 6 is... dunno - AOC?
 		If rsUser("type") = 0 Or rsUser("type") = 3  Or rsUser("type") = 4 Or rsUser("type") = 5 Then 
 			Session("DeptID") = rsUser("DeptLB")
 			Session("ReqID") = rsUser("ReqLB")
@@ -82,9 +89,9 @@ Set rsUser = Nothing
 <%
 If ValidAko = True Then
 	If Session("type") = 0 Or Session("type") = 4 Or Session("type") = 5 Or Session("type") = 6 Then
-		If Session("UID") <> 36 Then
+		If Session("UID") <> 36 Then	
 			Response.Redirect "calendarview2.asp"	
-		Else
+		Else ' this does NOT happen!
 			Response.Redirect "main.asp"
 		End If
 	ElseIf Session("type") = 1 Then 
@@ -94,7 +101,7 @@ If ValidAko = True Then
 	ElseIf Session("type") = 3 Then 
 		Response.Redirect "calendarview2.asp"
 	End If
-Else
+Else ' go back to the login screen, which could be sql injected
 	Response.Redirect "default.asp"
 End If
 %>
