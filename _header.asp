@@ -1,3 +1,10 @@
+<%
+strNewReqLink = "main.asp"
+If (Session("InstID") = 860) Then
+	strNewReqLink = "main_min.asp"
+End If
+' Response.Write "Inst: " & Session("InstID")
+%>
 <table cellSpacing='0' cellPadding='0' width="100%" border='0' align="center">
 	<tr>
 		<td valign='top' align="left" rowspan="2" width="75%" height="65px" colspan="10">
@@ -16,7 +23,7 @@
 		</td>
 		<% If Session("type") = 0 Or Session("type") = 4 Or Session("type") = 5 Then %>
 			<td align='center' class='head' width='20px'>&nbsp;|&nbsp;</td> 
-			<td align='center' width='100px'><a href='main.asp' class='linkv2'>New Request</a></td>
+			<td align='center' width='100px'><a href='<%=strNewReqLink%>' class='linkv2'>New Request</a></td>
 			<% If Session("UID") <> 36 Then %>
 				<td align='center' class='head' width='20px'>&nbsp;|&nbsp;</td> 
 				<td align='center' width='100px'><a href='reqtable.asp' class='linkv2'>List</a></td>
@@ -40,7 +47,7 @@
 			<td align='center' class='head' width='20px'>&nbsp;|&nbsp;</td> 
 		<% ElseIf Session("type") = 3 Then%>
 			<td align='center' class='head' width='20px'>&nbsp;|&nbsp;</td> 
-			<td align='center' width='100px'><a href='main.asp' class='linkv2'>New Request</a></td>
+			<td align='center' width='100px'><a href='<%=strNewReqLink%>' class='linkv2'>New Request</a></td>
 			<td align='center' class='head' width='20px'>&nbsp;|&nbsp;</td> 
 			<td align='center' width='100px'><a href='reqtable.asp' class='linkv2'>List</a></td>
 			<td align='center' class='head' width='20px'>&nbsp;|&nbsp;</td> 

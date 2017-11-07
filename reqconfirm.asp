@@ -74,6 +74,11 @@ End Function
 'rsInst.Close
 'Set rsInst = Nothing
 'GET INST and DEPTV2
+If (Session("InstID") = 860) Then
+	strNewReqLink = "main_min.asp"
+Else
+	strNewReqLink = "main.asp"
+End If
 Set rsInst = Server.CreateObject("ADODB.RecordSet")
 sqlInst = "SELECT * FROM Appointment_T WHERE [index] = " & Request("ID")
 rsInst.Open sqlInst, g_strCONN, 3, 1
@@ -250,7 +255,7 @@ End If
 		}
 		function CloneMe(xxx)
 		{
-			document.frmConfirm.action = "main.asp?clone=" + xxx;
+			document.frmConfirm.action = "<%=strNewReqLink%>?clone=" + xxx;
 			document.frmConfirm.submit();
 		}
 		function PrintMe(xxx)
@@ -520,7 +525,7 @@ End If
 								<td colspan='2' align='center' height='100px' valign='bottom'>
 									<input class='btn' type='button' style='width: 125px;' value='View in Calendar' onmouseover="this.className='hovbtn'" onmouseout="this.className='btn'" onclick="document.location='calendarview2.asp?appdate=<%=tmpAppDate%>'">
 									<% If Session("type") = 0 Or Session("type") = 3 Or Session("type") = 4 Or Session("type") = 5 Then %>
-										<input class='btn' type='button' style='width: 125px;' value='Edit' onmouseover="this.className='hovbtn'" onmouseout="this.className='btn'" onclick="document.location='main.asp?ID=<%=Request("ID")%>';" <%=LockMe%>>
+										<input class='btn' type='button' style='width: 125px;' value='Edit' onmouseover="this.className='hovbtn'" onmouseout="this.className='btn'" onclick="document.location='<%=strNewReqLink%>?ID=<%=Request("ID")%>';" <%=LockMe%>>
 										<input class='btn' type='button' style='width: 125px;' value='Cancel Appt.' onmouseover="this.className='hovbtn'" onmouseout="this.className='btn'" onclick='CancelMe(<%=Request("ID")%>, <%=tmpstat2%>);' <%=LockMe%>>
 										<% If Session("InstID") = 108 Or Session("myClass") = 3 Then %>	
 											<input class='btn' type='button' style='width: 125px;' value='Print' onmouseover="this.className='hovbtn'" onmouseout="this.className='btn'" onclick='PrintMe(<%=Request("ID")%>);'>

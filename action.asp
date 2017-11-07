@@ -90,7 +90,8 @@ End Function
 If Request("ctrl") = 1 Then 'save new appointment
 	tmpTS = Now
 	'STORE ENTRIES ON COOKIE FOR EDITING AND SAVING ENTRIES
-	Response.Cookies("LBREQUEST") = Z_DoEncrypt(Request("txtClilname")	& "|" & _
+	
+	tmpEnt = Request("txtClilname")	& "|" & _
 		Request("txtClifname")	& "|" & Request("selReas")	& "|" & Request("chkCall")	& "|" & Request("selDept")	& "|" & _
 		Request("txtCliFon")	& "|" & Request("txtCliMobile")	& "|" & _
 		Request("selLang") & "|" & Request("txtAppDate")	& "|" & Request("txtAppTFrom")	& "|" & Request("txtAppTTo") & "|" & Request("txtcom") & "|" & _
@@ -101,7 +102,9 @@ If Request("ctrl") = 1 Then 'save new appointment
 		Request("txtdhhsFon") & "|" & Request("txtoLang") & "|" & Request("chkCall2") & "|" & Request("txtchrg") & "|" & Request("txtAtrny") & "|" & _
 		Request("txtDOB") & "|" & Request("txtPDamount") & "|" & Request("h_tmpfilename") & "|" & Request("chkout") & "|" & Request("chkmed") & "|" & _
 		Request("MCnum") & "|" & Request("chkacc") & "|" & Request("chkcomp") & "|" & Request("selIns") & "|" & Request("txtemail") & "|" & _
-		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & Request("chkleave") & "|" & Request("txtCliCir"))
+		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & Request("chkleave") & "|" & Request("txtCliCir")
+	Response.Cookies("LBREQUEST") = Z_DoEncrypt(tmpEnt)
+	'txtemail is tmpEnt(43)
 	'CHECK VALID VALUES
 	If Session("myClass") <> 3 Then
 		If Request("txtTP") <> "" Then
@@ -131,7 +134,7 @@ If Request("ctrl") = 1 Then 'save new appointment
 	End If
 	If Session("MSG") = "" Then	
 		'GET COOKIE OF REQUEST
-		tmpEntry = Split(Z_DoDecrypt(Request.Cookies("LBREQUEST")), "|")
+		tmpEntry = Split(tmpEnt, "|")
 		deptRate = GetDeptRate(tmpEntry(4))
 		'SAVE ENTRIES
 		Set rsMain = Server.CreateObject("ADODB.RecordSet")
@@ -213,8 +216,9 @@ If Request("ctrl") = 1 Then 'save new appointment
 		rsMain("DeptID") = tmpEntry(4)
 		rsMain("ReqID") = Session("ReqID")
 		rsMain("InstLB") = Session("InstID")
+		rsMain("PDemail") = tmpEntry(43)
 		If Session("type") = 5 Then
-			rsMain("PDemail") = tmpEntry(43)
+			'rsMain("PDemail") = tmpEntry(43)
 			rsMain("PDamount") = Z_CZero(tmpEntry(35))
 			rsMain("UploadFile") = False
 			If FileUpload(tmpEntry(36)) Then 
@@ -690,7 +694,7 @@ ElseIf Request("ctrl") = 2 Then 'save reason
 	Response.Redirect "Encounter.asp?NewKey=1&txtAppDate=" & tmpAppDate
 ElseIf Request("ctrl") = 3 Then 'edit appointment
 	'STORE ENTRIES ON COOKIE FOR EDITING AND SAVING ENTRIES
-	Response.Cookies("LBREQUEST") = Z_DoEncrypt(Request("txtClilname")	& "|" & _
+	tmpEnt = Request("txtClilname")	& "|" & _
 		Request("txtClifname")	& "|" & Request("selReas")	& "|" & Request("chkCall")	& "|" & Request("selDept")	& "|" & _
 		Request("txtCliFon")	& "|" & Request("txtCliMobile")	& "|" & _
 		Request("selLang") & "|" & Request("txtAppDate")	& "|" & Request("txtAppTFrom")	& "|" & Request("txtAppTTo") & "|" & Request("txtcom") & "|" & _
@@ -701,7 +705,8 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		Request("txtdhhsFon") & "|" & Request("txtoLang") & "|" & Request("chkCall2") & "|" & Request("txtchrg") & "|" & Request("txtAtrny") & "|" & _
 		Request("txtDOB") & "|" & Request("txtPDamount") & "|" & Request("h_tmpfilename") & "|" & Request("chkout") & "|" & Request("chkmed") & "|" & _
 		Request("MCnum") & "|" & Request("chkacc") & "|" & Request("chkcomp") & "|" & Request("selIns") & "|" & Request("txtemail") & "|" & _
-		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & Request("chkleave") & "|" & Request("txtCliCir"))
+		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & Request("chkleave") & "|" & Request("txtCliCir")
+	Response.Cookies("LBREQUEST") = Z_DoEncrypt(tmpEnt)
 	'CHECK VALID VALUES
 	If Session("myClass") <> 3 Then
 		If Request("txtTP") <> "" Then
@@ -722,7 +727,8 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 	End If
 	If Session("MSG") = "" Then	
 		'GET COOKIE OF REQUEST
-		tmpEntry = Split(Z_DoDecrypt(Request.Cookies("LBREQUEST")), "|")
+		'tmpEntry = Split(Z_DoDecrypt(Request.Cookies("LBREQUEST")), "|")
+		tmpEntry = split(tmpEnt, "|")
 		'SAVE ENTRIES
 		Set rsMain = Server.CreateObject("ADODB.RecordSet")
 		sqlMain = "SELECT * FROM appointment_T WHERE [index] = " & Request("ID")
@@ -814,8 +820,9 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		rsMain("sphone") = tmpEntry(28)
 		rsMain("rphone") = tmpEntry(26)
 		rsMain("olang") = tmpEntry(29)
+		rsMain("PDemail") = tmpEntry(42)
 		If Session("type") = 5 Then
-			rsMain("PDemail") = tmpEntry(42)
+			'rsMain("PDemail") = tmpEntry(42)
 			rsMain("PDamount") = Z_CZero(tmpEntry(34))
 			If FileUpload(tmpEntry(35)) Then 
 				rsMain("UploadFile") = True
