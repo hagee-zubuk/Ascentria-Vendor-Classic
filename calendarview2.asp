@@ -445,6 +445,7 @@ Set rsReq = Nothing
 			onload='PopMe(<%=Request("rpt")%>);'
 		<%End If%>
 		>
+		<!-- Inst: <%=Session("InstID")%>, Type: <%=Session("Type")%> -->
 		<form method='post' name='frmCal'>
 			<table cellSpacing='0' cellPadding='0' height='100%' width="100%" border='0' class='bgstyle2'>
 				<tr>

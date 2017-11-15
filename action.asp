@@ -435,10 +435,15 @@ If Request("ctrl") = 1 Then 'save new appointment
 			tmpAppDateTime = CDate(tmpAppDate & " " & tmpAppTimeFrom)
 			If DateDiff("n", Now, tmpAppDateTime) < 1440 Then strSubj = "URGENT - Interpreter Request - " & tmpInst & " - " & tmpDept
 			Set mlMail = CreateObject("CDO.Message")
-	mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")= 2
-	mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver") = "localhost"
-	mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport") = 26
-	mlMail.Configuration.Fields.Update
+With mlMail.Configuration
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")		= 2
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver")		= "smtp.socketlabs.com"
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport")	= 2525
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername")		= "server3874"
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword")		= "UO2CUSxat9ZmzYD7jkTB"
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate")	= 1 'basic (clear-text) authentication
+	.Fields.Update
+End With
 			mlMail.To = "language.services@thelanguagebank.org"
 			'mlMail.Bcc = "sysdump1@zubuk.com"
 			mlMail.From = "language.services@thelanguagebank.org"
@@ -994,10 +999,15 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		Set rsHist = Nothing
 		'on error resume next
 			Set mlMail = CreateObject("CDO.Message")
-			mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")= 2
-			mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver") = "localhost"
-			mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport") = 26
-			mlMail.Configuration.Fields.Update
+With mlMail.Configuration
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")		= 2
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver")		= "smtp.socketlabs.com"
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport")	= 2525
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername")		= "server3874"
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword")		= "UO2CUSxat9ZmzYD7jkTB"
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate")	= 1 'basic (clear-text) authentication
+	.Fields.Update
+End With
 			mlMail.To = "language.services@thelanguagebank.org"
 			'mlMail.Bcc = "sysdump1@zubuk.com"
 			mlMail.From = "language.services@thelanguagebank.org"
@@ -1210,10 +1220,15 @@ ElseIf Request("ctrl") = 8 Then 'cancel request
 	End If
 	'SEND EMAIL TO NOTIFY CANCEL TO LB
 	Set mlMail = CreateObject("CDO.Message")
-	mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")= 2
-	mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver") = "localhost"
-	mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport") = 26
-	mlMail.Configuration.Fields.Update
+With mlMail.Configuration
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")		= 2
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver")		= "smtp.socketlabs.com"
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport")	= 2525
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername")		= "server3874"
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword")		= "UO2CUSxat9ZmzYD7jkTB"
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate")	= 1 'basic (clear-text) authentication
+	.Fields.Update
+End With
 	mlMail.To = "language.services@thelanguagebank.org"
 	mlMail.From = "language.services@thelanguagebank.org"
 	'mlMail.Bcc = "sysdump1@zubuk.com"
@@ -1231,10 +1246,15 @@ ElseIf Request("ctrl") = 8 Then 'cancel request
 	 If tmpIntr > 0  Then
 	  'SEND EMAIL TO NOTIFY CANCEL TO INTR
 	 Set mlMail = CreateObject("CDO.Message")
-		mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")= 2
-		mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver") = "localhost"
-		mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport") = 26
-		mlMail.Configuration.Fields.Update
+With mlMail.Configuration
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")		= 2
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver")		= "smtp.socketlabs.com"
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport")	= 2525
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername")		= "server3874"
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword")		= "UO2CUSxat9ZmzYD7jkTB"
+	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate")	= 1 'basic (clear-text) authentication
+	.Fields.Update
+End With
 		mlMail.To = GetPrime2(tmpIntr)
 		mlMail.Cc = "language.services@thelanguagebank.org"
 		'mlMail.Bcc = "sysdump1@zubuk.com"

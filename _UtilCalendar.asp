@@ -180,13 +180,15 @@ Function Z_EmailJob(AppID)
 								rsIntr("sendonce") = True
 								rsIntr.Update
 								Set mlMail = CreateObject("CDO.Message")
-								mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing") = 2
-								mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver") = "smtp.socketlabs.com"
-								mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport") = 25
-								mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate") = 1 'basic (clear-text) authentication
-								mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername") = "server12389"
-								mlMail.Configuration.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword") = "t6XRy5i2CSz89EoBw4"
-								mlMail.Configuration.Fields.Update
+								With mlMail.Configuration
+									.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")		= 2
+									.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver")		= "smtp.socketlabs.com"
+									.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport")	= 2525
+									.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername")		= "server3874"
+									.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword")		= "UO2CUSxat9ZmzYD7jkTB"
+									.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate")	= 1 'basic (clear-text) authentication
+									.Fields.Update
+								End With
 								mlMail.To = Trim(rsIntr("e-mail"))
 								mlMail.Cc = "language.services@thelanguagebank.org"
 								'mlMail.Bcc = "sysdump1@zubuk.com"
