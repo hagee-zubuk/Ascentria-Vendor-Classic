@@ -96,13 +96,18 @@ div.tabextern {
 #botlinks a:hover {
 	text-decoration	: underline;
 }
+.err {
+	background-color: yellow;
+	color: red;
+	font-weight: bold;
+}
 	</style>
 </head>
 <body>
 	<div class="container">
 		<div class="row">
 			<div class="col-md-4 offset-md-4 align-self-center" style="margin-top: 50px; text-align: center;">
-				<img id="imgLbLogo" src="images/logo.jpg" alt="Language Bank" style="width: 100%;"/>
+				<a href="https://www.thelanguagebank.org/"><img id="imgLbLogo" src="images/logo.jpg" alt="Language Bank" style="width: 100%;"/></a>
 			</div>
 	    </div>
 		<div class="row" style="margin-top: 30px; margin-bottom: 20px;">
@@ -113,9 +118,10 @@ div.tabextern {
 		</div>
 		<div class="row" >
 			<div class="col-md-4 offset-md-4">
+				<div class="err"><%=Session("MSG")%></div>
 				<form method="post" name="frmLogIn" action="signin.asp">
 					<div class="tabstuff tablogin">LOGIN</div>
-					<div class="tabstuff tabextern">SIGN UP</div>
+					<div class="tabstuff tabextern"><a href="https://www.thelanguagebank.org/about-us">SIGN UP</a></div>
 					<div class="tabstuff loginarea">
 						<input type="input" maxlength="20" id="txtUN" name="txtUN" placeholder="username" />
 						<input type="password" maxlength="30" id="txtPW" name="txtPW" placeholder="password" />
@@ -164,3 +170,6 @@ div.tabextern {
 	<div class="bottom">&nbsp;</div>
 </body>
 </html>
+<%
+Session("MSG") = ""
+%>

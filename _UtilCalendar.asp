@@ -1,6 +1,6 @@
 <%
 Function AddLog(strmsg)
-	tmpPath = "C:\WORK\ascentria\vendor\log\"
+	tmpPath = "C:\WORK\InterReq\log\"
 	tmpFile = Replace(Date, "/", "") 
 	Set fso = CreateObject("Scripting.FileSystemObject")
 	Set oFile = fso.OpenTextFile(tmpPath & tmpFile & ".log", 8, True)
@@ -179,27 +179,13 @@ Function Z_EmailJob(AppID)
 							If Not rsIntr("sendonce") Or Urgent = "URGENT" Then
 								rsIntr("sendonce") = True
 								rsIntr.Update
-								Set mlMail = CreateObject("CDO.Message")
-								With mlMail.Configuration
-									.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")		= 2
-									.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver")		= "smtp.socketlabs.com"
-									.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport")	= 2525
-									.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername")		= "server3874"
-									.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword")		= "UO2CUSxat9ZmzYD7jkTB"
-									.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate")	= 1 'basic (clear-text) authentication
-									.Fields.Update
-								End With
-								mlMail.To = Trim(rsIntr("e-mail"))
-								mlMail.Cc = "language.services@thelanguagebank.org"
-								'mlMail.Bcc = "sysdump1@zubuk.com"
-								mlMail.From = "DO-NOT-REPLY@thelanguagebank.org"
-								mlMail.Subject = "[LBIS] " & Urgent & " New Appointment in the Database"
 								strBody = "<p>Language Bank has received new request for your language(s) and skills.<br>" & _
-									"Please log into the <a href='https://interpreter.thelanguagebank.org/interpreter/'>LB database</a> and let us know if you are available.</p>" & _
-									"<font size='1' face='trebuchet MS'>* Please do not reply to this email. This is a computer generated email." & appID & "</font>"
-								mlMail.HTMLBody = "<html><body>" & vbCrLf & strBody & vbCrLf & "</body></html>"	
-								mlMail.Send
-								set mlMail = Nothing
+										"Please log into the <a href='https://interpreter.thelanguagebank.org/interpreter/'>" & _
+										"LB database</a> and let us know if you are available.</p>" & _
+										"<font size='1' face='trebuchet MS'>* Please do not reply to this email. This is a " & _
+										"computer generated email." & appID & "</font>"
+								retVal = zSendMessage(Trim(rsIntr("e-mail")), "language.services@thelanguagebank.org" _
+										, "[LBIS] " & Urgent & " New Appointment in the Database", strBody)
 							End If
 						End If
 					End If

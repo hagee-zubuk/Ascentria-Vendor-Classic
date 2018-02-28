@@ -90,8 +90,7 @@ End Function
 If Request("ctrl") = 1 Then 'save new appointment
 	tmpTS = Now
 	'STORE ENTRIES ON COOKIE FOR EDITING AND SAVING ENTRIES
-	
-	tmpEnt = Request("txtClilname")	& "|" & _
+	Response.Cookies("LBREQUEST") = Z_DoEncrypt(Request("txtClilname")	& "|" & _
 		Request("txtClifname")	& "|" & Request("selReas")	& "|" & Request("chkCall")	& "|" & Request("selDept")	& "|" & _
 		Request("txtCliFon")	& "|" & Request("txtCliMobile")	& "|" & _
 		Request("selLang") & "|" & Request("txtAppDate")	& "|" & Request("txtAppTFrom")	& "|" & Request("txtAppTTo") & "|" & Request("txtcom") & "|" & _
@@ -102,9 +101,7 @@ If Request("ctrl") = 1 Then 'save new appointment
 		Request("txtdhhsFon") & "|" & Request("txtoLang") & "|" & Request("chkCall2") & "|" & Request("txtchrg") & "|" & Request("txtAtrny") & "|" & _
 		Request("txtDOB") & "|" & Request("txtPDamount") & "|" & Request("h_tmpfilename") & "|" & Request("chkout") & "|" & Request("chkmed") & "|" & _
 		Request("MCnum") & "|" & Request("chkacc") & "|" & Request("chkcomp") & "|" & Request("selIns") & "|" & Request("txtemail") & "|" & _
-		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & Request("chkleave") & "|" & Request("txtCliCir")
-	Response.Cookies("LBREQUEST") = Z_DoEncrypt(tmpEnt)
-	'txtemail is tmpEnt(43)
+		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & Request("chkleave") & "|" & Request("txtCliCir"))
 	'CHECK VALID VALUES
 	If Session("myClass") <> 3 Then
 		If Request("txtTP") <> "" Then
@@ -134,11 +131,12 @@ If Request("ctrl") = 1 Then 'save new appointment
 	End If
 	If Session("MSG") = "" Then	
 		'GET COOKIE OF REQUEST
-		tmpEntry = Split(tmpEnt, "|")
+		tmpEntry = Split(Z_DoDecrypt(Request.Cookies("LBREQUEST")), "|")
 		deptRate = GetDeptRate(tmpEntry(4))
 		'SAVE ENTRIES
 		Set rsMain = Server.CreateObject("ADODB.RecordSet")
 		sqlMain = "SELECT * FROM appointment_T WHERE [timestamp] = '" & now & "'"
+		response.write sqlMain
 		rsMain.Open sqlMain, g_strCONN, 1, 3
 		rsMain.AddNew
 		rsMain("timestamp") = tmpTS
@@ -216,9 +214,8 @@ If Request("ctrl") = 1 Then 'save new appointment
 		rsMain("DeptID") = tmpEntry(4)
 		rsMain("ReqID") = Session("ReqID")
 		rsMain("InstLB") = Session("InstID")
-		rsMain("PDemail") = tmpEntry(43)
 		If Session("type") = 5 Then
-			'rsMain("PDemail") = tmpEntry(43)
+			rsMain("PDemail") = tmpEntry(43)
 			rsMain("PDamount") = Z_CZero(tmpEntry(35))
 			rsMain("UploadFile") = False
 			If FileUpload(tmpEntry(36)) Then 
@@ -427,168 +424,153 @@ If Request("ctrl") = 1 Then 'save new appointment
 		If GetLBLang(langsel) <> 52 And GetLBLang(langsel) <> 78 And GetLBLang(langsel) <> 81 And  GetLBLang(langsel) <> 90 And  GetLBLang(langsel) <> 85 And tmpEntry(14) <> 4 And tmpEntry(31) = "" Then
 			call Z_EmailJob(tmpLBID)
 		End If
-		Call AddLog("Appointment " & tmpID & " EMAILS SENT TO INTERPRETERS.")
+		Call AddLog("Appointment " & tmpID & " EMAIL SENT TO INTERPRETERS.")
 		'EMAIL TO LB STAFF
 		'If Request("SubmitMe") = 1 Then
 	'on error resume next
-			strSubj = "Interpreter Request - " & tmpInst & " - " & tmpDept
-			tmpAppDateTime = CDate(tmpAppDate & " " & tmpAppTimeFrom)
-			If DateDiff("n", Now, tmpAppDateTime) < 1440 Then strSubj = "URGENT - Interpreter Request - " & tmpInst & " - " & tmpDept
-			Set mlMail = CreateObject("CDO.Message")
-With mlMail.Configuration
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")		= 2
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver")		= "smtp.socketlabs.com"
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport")	= 2525
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername")		= "server3874"
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword")		= "UO2CUSxat9ZmzYD7jkTB"
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate")	= 1 'basic (clear-text) authentication
-	.Fields.Update
-End With
-			mlMail.To = "language.services@thelanguagebank.org"
-			'mlMail.Bcc = "sysdump1@zubuk.com"
-			mlMail.From = "language.services@thelanguagebank.org"
-			mlMail.Subject = strSubj
-			strBody = "<table cellpadding='0' cellspacing='0' border='0' align='center'>" & vbCrLf & _
-					"<tr><td align='center'>" & vbCrLf & _
-						"<img src='http://languagebank.lssne.org/lsslbis/images/LBISLOGOBandW.jpg'>" & vbCrLf & _
-					"</td></tr>" & vbCrLf & _
-					"<tr><td>&nbsp;</td></tr>" & vbCrLf & _	
-					"<tr><td align='center'>" & vbCrLf & _
-						"<font size='2' face='trebuchet MS'><b>Interpreter Request:</b></font><br>" & vbCrLf & _
-					"</td></tr>" & vbCrLf & _
-					"<tr><td>&nbsp;</td></tr>" & vbCrLf & _
-					"<tr><td>" & vbCrLf & _
-						"<table cellpadding='0' cellspacing='0' border='2' width='100%'>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right' width='225px'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Institution - Department:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpInst & " - " & tmpDept & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Requesting Person:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpUname & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-						"</table>" & vbCrLf & _
-					"</td></tr>" & vbCrLf & _
-					"<tr><td>&nbsp;</td></tr>" & vbCrLf & _	
-					"<tr><td>" & vbCrLf & _
-						"<table cellpadding='0' cellspacing='0' border='2' width='100%'>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right' width='225px'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>HospitalPilot ID:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpID & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right' width='225px'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>LanguageBank ID:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpLBID & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Client Name:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpCName & "&nbsp;" & tmpCall & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Phone No.:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpFon & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Mobile No.:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpMobile & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Date of Appointment:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpAppDate & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Time of Appointment:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpAppTime & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Language:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpLang & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right' valign='top'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Reason:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpReas & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right' valign='top'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Appointment Comment:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpACom & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right' valign='top'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Languagebank Comment:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpLCom & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right' valign='top'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Interpreter Comment:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpICom & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-						"</table>" & vbCrLf & _
-					"</td></tr>" & vbCrLf & _
-					"<tr><td>&nbsp;</td></tr>" & vbCrLf & _
-					"<tr><td align='left'>" & vbCrLf & _
-					"<font size='1' face='trebuchet MS'>* Please do not reply to this email. This is a computer generated email. Use the information above for questions.</font>" & vbCrLf & _
-					"</td></tr>" & vbCrLf & _
+			
+		tmpAppDateTime = CDate(tmpAppDate & " " & tmpAppTimeFrom)
+		If DateDiff("n", Now, tmpAppDateTime) < 1440 Then strSubj = "URGENT - Interpreter Request - " & tmpInst & " - " & tmpDept
+		strBody = "<table cellpadding='0' cellspacing='0' border='0' align='center'>" & vbCrLf & _
+				"<tr><td align='center'>" & vbCrLf & _
+				"<img src='http://languagebank.lssne.org/lsslbis/images/LBISLOGOBandW.jpg'>" & vbCrLf & _
+				"</td></tr>" & vbCrLf & _
+				"<tr><td>&nbsp;</td></tr>" & vbCrLf & _	
+				"<tr><td align='center'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'><b>Interpreter Request:</b></font><br>" & vbCrLf & _
+				"</td></tr>" & vbCrLf & _
+				"<tr><td>&nbsp;</td></tr>" & vbCrLf & _
+				"<tr><td>" & vbCrLf & _
+				"<table cellpadding='0' cellspacing='0' border='2' width='100%'>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right' width='225px'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Institution - Department:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpInst & " - " & tmpDept & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Requesting Person:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpUname & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"</table>" & vbCrLf & _
+				"</td></tr>" & vbCrLf & _
+				"<tr><td>&nbsp;</td></tr>" & vbCrLf & _	
+				"<tr><td>" & vbCrLf & _
+				"<table cellpadding='0' cellspacing='0' border='2' width='100%'>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right' width='225px'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>HospitalPilot ID:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpID & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right' width='225px'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>LanguageBank ID:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpLBID & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Client Name:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpCName & "&nbsp;" & tmpCall & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Phone No.:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpFon & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Mobile No.:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpMobile & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Date of Appointment:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpAppDate & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Time of Appointment:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpAppTime & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Language:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpLang & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right' valign='top'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Reason:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpReas & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right' valign='top'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Appointment Comment:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpACom & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right' valign='top'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Languagebank Comment:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpLCom & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"<tr>" & vbCrLf & _
+				"<td align='right' valign='top'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Interpreter Comment:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpICom & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & _
+				"</tr>" & vbCrLf & _
+				"</table>" & vbCrLf & _
+				"</td></tr>" & vbCrLf & _
+				"<tr><td>&nbsp;</td></tr>" & vbCrLf & _
+				"<tr><td align='left'>" & vbCrLf & _
+				"<font size='1' face='trebuchet MS'>* Please do not reply to this email. This is a computer" & _
+				"generated message. Use the information above for questions.</font>" & vbCrLf & _
+				"</td></tr>" & vbCrLf & _
 				"</table>"
-			mlMail.HTMLBody = "<html><body>" & vbCrLf & strBody & vbCrLf & "</body></html>"
-		'on error resume next 
-'			mlMail.Send
-			Session("MSG") = "Request for Interpreter submitted to LanguageBank."
-		set mlMail=nothing
-		Call AddLog("Appointment " & tmpID & " EMAILS SENT TO INSTITUTION.")
+			strSubj = "Interpreter Request - " & tmpInst & " - " & tmpDept
+			retVal = zSendMessage("language.services@thelanguagebank.org", "", strSubj, strBody)
+			Session("MSG") = "Request for Interpreter submitted to LanguageBank. (" & retVal & ")"
+		Call AddLog("Appointment " & tmpID & " EMAIL SENT TO STAFF.")
 		Call AddLog("Appointment " & tmpID & " SUCCESS.")
 		'send email here
 		Response.Redirect "reqconfirm.asp?ID=" & tmpID
@@ -699,7 +681,7 @@ ElseIf Request("ctrl") = 2 Then 'save reason
 	Response.Redirect "Encounter.asp?NewKey=1&txtAppDate=" & tmpAppDate
 ElseIf Request("ctrl") = 3 Then 'edit appointment
 	'STORE ENTRIES ON COOKIE FOR EDITING AND SAVING ENTRIES
-	tmpEnt = Request("txtClilname")	& "|" & _
+	Response.Cookies("LBREQUEST") = Z_DoEncrypt(Request("txtClilname")	& "|" & _
 		Request("txtClifname")	& "|" & Request("selReas")	& "|" & Request("chkCall")	& "|" & Request("selDept")	& "|" & _
 		Request("txtCliFon")	& "|" & Request("txtCliMobile")	& "|" & _
 		Request("selLang") & "|" & Request("txtAppDate")	& "|" & Request("txtAppTFrom")	& "|" & Request("txtAppTTo") & "|" & Request("txtcom") & "|" & _
@@ -710,8 +692,7 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		Request("txtdhhsFon") & "|" & Request("txtoLang") & "|" & Request("chkCall2") & "|" & Request("txtchrg") & "|" & Request("txtAtrny") & "|" & _
 		Request("txtDOB") & "|" & Request("txtPDamount") & "|" & Request("h_tmpfilename") & "|" & Request("chkout") & "|" & Request("chkmed") & "|" & _
 		Request("MCnum") & "|" & Request("chkacc") & "|" & Request("chkcomp") & "|" & Request("selIns") & "|" & Request("txtemail") & "|" & _
-		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & Request("chkleave") & "|" & Request("txtCliCir")
-	Response.Cookies("LBREQUEST") = Z_DoEncrypt(tmpEnt)
+		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & Request("chkleave") & "|" & Request("txtCliCir"))
 	'CHECK VALID VALUES
 	If Session("myClass") <> 3 Then
 		If Request("txtTP") <> "" Then
@@ -732,8 +713,7 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 	End If
 	If Session("MSG") = "" Then	
 		'GET COOKIE OF REQUEST
-		'tmpEntry = Split(Z_DoDecrypt(Request.Cookies("LBREQUEST")), "|")
-		tmpEntry = split(tmpEnt, "|")
+		tmpEntry = Split(Z_DoDecrypt(Request.Cookies("LBREQUEST")), "|")
 		'SAVE ENTRIES
 		Set rsMain = Server.CreateObject("ADODB.RecordSet")
 		sqlMain = "SELECT * FROM appointment_T WHERE [index] = " & Request("ID")
@@ -825,9 +805,8 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		rsMain("sphone") = tmpEntry(28)
 		rsMain("rphone") = tmpEntry(26)
 		rsMain("olang") = tmpEntry(29)
-		rsMain("PDemail") = tmpEntry(42)
 		If Session("type") = 5 Then
-			'rsMain("PDemail") = tmpEntry(42)
+			rsMain("PDemail") = tmpEntry(42)
 			rsMain("PDamount") = Z_CZero(tmpEntry(34))
 			If FileUpload(tmpEntry(35)) Then 
 				rsMain("UploadFile") = True
@@ -997,102 +976,49 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		end if
 		rsHist.Close
 		Set rsHist = Nothing
-		'on error resume next
-			Set mlMail = CreateObject("CDO.Message")
-With mlMail.Configuration
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")		= 2
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver")		= "smtp.socketlabs.com"
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport")	= 2525
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername")		= "server3874"
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword")		= "UO2CUSxat9ZmzYD7jkTB"
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate")	= 1 'basic (clear-text) authentication
-	.Fields.Update
-End With
-			mlMail.To = "language.services@thelanguagebank.org"
-			'mlMail.Bcc = "sysdump1@zubuk.com"
-			mlMail.From = "language.services@thelanguagebank.org"
-			mlMail.Subject = "Interpreter Request (edited) - " & tmpInst & " - " & tmpDept
-			strBody = "<table cellpadding='0' cellspacing='0' border='0' align='center'>" & vbCrLf & _
-					"<tr><td align='center'>" & vbCrLf & _
-						"<img src='http://web04.zubuk.com/lss-lbis-staging/images/LBISLOGOBandW.jpg'>" & vbCrLf & _
-					"</td></tr>" & vbCrLf & _
-					"<tr><td>&nbsp;</td></tr>" & vbCrLf & _	
-					"<tr><td align='center'>" & vbCrLf & _
-						"<font size='2' face='trebuchet MS'><b>Interpreter Request:</b></font><br>" & vbCrLf & _
-					"</td></tr>" & vbCrLf & _
-					"<tr><td>&nbsp;</td></tr>" & vbCrLf & _
-					"<tr><td>" & vbCrLf & _
-						"<table cellpadding='0' cellspacing='0' border='2' width='100%'>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right' width='225px'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Institution - Department:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpInst & " - " & tmpDept & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-						"</table>" & vbCrLf & _
-					"</td></tr>" & vbCrLf & _
-					"<tr><td>&nbsp;</td></tr>" & vbCrLf & _	
-					"<tr><td>" & vbCrLf & _
-						"<table cellpadding='0' cellspacing='0' border='2' width='100%'>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right' width='225px'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>HospitalPilot ID:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpHPID & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right' width='225px'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>LanguageBank ID:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpLBID & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Client Name:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpCName & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Date of Appointment:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpAppDate & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-							"<tr>" & vbCrLf & _
-								"<td align='right'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>Time of Appointment:</font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-								"<td align='left'>" & vbCrLf & _
-									"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpAppTime & "</b></font><br>" & vbCrLf & _
-								"</td>" & vbCrLf & _
-							"</tr>" & vbCrLf & _
-						"</table>" & vbCrLf & _
-					"</td></tr>" & vbCrLf & _
-					"<tr><td>&nbsp;</td></tr>" & vbCrLf & _
-					"<tr><td align='left'>" & vbCrLf & _
-					"<font size='1' face='trebuchet MS'>* Value in parenthesis is previous value.</font>" & vbCrLf & _
-					"</td></tr>" & vbCrLf & _
-				"</table>"
-			mlMail.HTMLBody = "<html><body>" & vbCrLf & strBody & vbCrLf & "</body></html>"
-		'on error resume next
-			mlMail.Send
-			Session("MSG") = "Changes for this appointment has been submitted to LanguageBank."
+		strBody = "<table cellpadding='0' cellspacing='0' border='0' align='center'>" & vbCrLf & _
+				"<tr><td align='center'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'><b>Interpreter Request:</b></font><br>" & vbCrLf & _
+				"</td></tr><tr><td>&nbsp;</td></tr><tr><td>" & vbCrLf & _
+				"<table cellpadding='0' cellspacing='0' border='2' width='100%'>" & vbCrLf & _
+				"<tr>" & vbCrLf & "<td align='right' width='225px'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Institution - Department:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & "<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpInst & " - " & tmpDept & "</b></font><br>" & vbCrLf & _
+				"</td></tr></table></td></tr><tr><td>&nbsp;</td></tr><tr><td>" & vbCrLf & _
+				"<table cellpadding='0' cellspacing='0' border='2' width='100%'>" & vbCrLf & _
+				"<tr>" & vbCrLf & "<td align='right' width='225px'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>HospitalPilot ID:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & "<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpHPID & "</b></font><br>" & vbCrLf & _
+				"</td></tr><tr><td align='right' width='225px'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>LanguageBank ID:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & "<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpLBID & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & "</tr>" & vbCrLf & "<tr>" & vbCrLf & "<td align='right'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Client Name:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & "<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpCName & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & "</tr>" & vbCrLf & "<tr>" & vbCrLf & "<td align='right'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Date of Appointment:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & "<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpAppDate & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & "</tr>" & vbCrLf & "<tr>" & vbCrLf & "<td align='right'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>Time of Appointment:</font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & "<td align='left'>" & vbCrLf & _
+				"<font size='2' face='trebuchet MS'>&nbsp;<b>" & tmpAppTime & "</b></font><br>" & vbCrLf & _
+				"</td>" & vbCrLf & "</tr>" & vbCrLf & "</table>" & vbCrLf & "</td></tr>" & vbCrLf & _
+				"<tr><td>&nbsp;</td></tr>" & vbCrLf & "<tr><td align='left'>" & vbCrLf & _
+				"<font size='1' face='trebuchet MS'>* Value in parenthesis is previous value.</font>" & vbCrLf & _
+				"</td></tr>" & vbCrLf & "</table>"
+			retVal = zSendMessage("language.services@thelanguagebank.org", "", "Interpreter Request (edited) - " & tmpInst & " - " & tmpDept, strBody)
+			Session("MSG") = "Changes for this appointment has been submitted to LanguageBank (" & retVal & ")."
 		If SaveHist(tmpLBID, "[HP]main.asp") Then
 	
 		End If
 		'log edit
 		Set fso = CreateObject("Scripting.FileSystemObject")
-		Set LogMe = fso.OpenTextFile("C:\work\lss-lbis\log\editlogs.txt", 8, True)
+		Set LogMe = fso.OpenTextFile("C:\work\interreq\log\editlogs.txt", 8, True)
 		strLog = Now & vbtab & "Appointment EDITED - ID: " & tmpLBID & " by " & Session("GreetMe") & " DATE: " & tmpAppDate & " TIME: " & tmpAppTime
 		LogMe.WriteLine strLog
 		Set LogMe = Nothing
@@ -1212,67 +1138,36 @@ ElseIf Request("ctrl") = 8 Then 'cancel request
 	If SaveHist(tmpLBID, "[HP]reqconfirm.asp") Then
 		'log edit
 		Set fso = CreateObject("Scripting.FileSystemObject")
-		Set LogMe = fso.OpenTextFile("C:\work\lss-lbis\log\editlogs.txt", 8, True)
+		Set LogMe = fso.OpenTextFile("C:\work\interreq\log\editlogs.txt", 8, True)
 		strLog = Now & vbtab & "Appointment Cancelled - ID: " & tmpLBID & " by " & Session("GreetMe") & " DATE: " & tmpDate & " TIME: " & tmpTime
 		LogMe.WriteLine strLog
 		Set LogMe = Nothing
 		Set fso = Nothing
 	End If
 	'SEND EMAIL TO NOTIFY CANCEL TO LB
-	Set mlMail = CreateObject("CDO.Message")
-With mlMail.Configuration
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")		= 2
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver")		= "smtp.socketlabs.com"
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport")	= 2525
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername")		= "server3874"
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword")		= "UO2CUSxat9ZmzYD7jkTB"
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate")	= 1 'basic (clear-text) authentication
-	.Fields.Update
-End With
-	mlMail.To = "language.services@thelanguagebank.org"
-	mlMail.From = "language.services@thelanguagebank.org"
-	'mlMail.Bcc = "sysdump1@zubuk.com"
-	mlMail.Subject = "HospitalPilot - Request Cancellation - Request ID: " & tmpLBID
 	strBody = "<img src='http://languagebank.lssne.org/lsslbis/images/LBISLOGOBandW.jpg'><br><br>" & vbCrLf & _
-	 "<font size='2' face='trebuchet MS'>Request ID: " & tmpLBID & " (HospitalPilot ID: " & Request("ID") & ") has been CANCELED by " & Session("GreetMe") & ".<br>" & vbCrLf & _
-	 "<font size='2' face='trebuchet MS'>Date: " & tmpDate & "<br>" & vbCrLf & _
-	 "<font size='2' face='trebuchet MS'>Time: " & tmpTime & "<br>" & vbCrLf & _
-	 "<font size='2' face='trebuchet MS'>Department: " & tmpDept & "<br>" & vbCrLf & _
-	 "<font size='2' face='trebuchet MS'>Client: " & tmpName & "<br><br>" & vbCrLf & _ 
-	 "<font size='1' face='trebuchet MS'>* Please do not reply to this email. This is a computer generated email.</font>" & vbCrLf
-	mlMail.HTMLBody = "<html><body>" & vbCrLf & strBody & vbCrLf & "</body></html>"
-	mlMail.Send
-	 set mlMail=nothing
-	 If tmpIntr > 0  Then
-	  'SEND EMAIL TO NOTIFY CANCEL TO INTR
-	 Set mlMail = CreateObject("CDO.Message")
-With mlMail.Configuration
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusing")		= 2
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserver")		= "smtp.socketlabs.com"
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpserverport")	= 2525
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendusername")		= "server3874"
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/sendpassword")		= "UO2CUSxat9ZmzYD7jkTB"
-	.Fields.Item("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate")	= 1 'basic (clear-text) authentication
-	.Fields.Update
-End With
-		mlMail.To = GetPrime2(tmpIntr)
-		mlMail.Cc = "language.services@thelanguagebank.org"
-		'mlMail.Bcc = "sysdump1@zubuk.com"
-		mlMail.From = "language.services@thelanguagebank.org"
-		mlMail.Subject = "Appointment Cancellation " & tmpDate & "; " & tmpTime & ", " & tmpCity & " - " &  tmpInst
+			"<font size='2' face='trebuchet MS'>Request ID: " & tmpLBID & " (HospitalPilot ID: " & Request("ID") & _
+			") has been CANCELED by " & Session("GreetMe") & ".<br>" & vbCrLf & _
+			"<font size='2' face='trebuchet MS'>Date: " & tmpDate & "<br>" & vbCrLf & _
+			"<font size='2' face='trebuchet MS'>Time: " & tmpTime & "<br>" & vbCrLf & _
+			"<font size='2' face='trebuchet MS'>Department: " & tmpDept & "<br>" & vbCrLf & _
+			"<font size='2' face='trebuchet MS'>Client: " & tmpName & "<br><br>" & vbCrLf & _ 
+			"<font size='1' face='trebuchet MS'>* Please do not reply to this email. This is a computer generated email.</font>" & vbCrLf
+	retVal = zSendMessage("language.services@thelanguagebank.org", "", "HospitalPilot - Request Cancellation - Request ID: " & tmpLBID, strBody)
+	If tmpIntr > 0  Then
+		'SEND EMAIL TO NOTIFY CANCEL TO INTR
 		strBody = "This is to let you know that appointment on " & _
-			 tmpDate & ", " & tmpTime & ", in " & tmpCity & " at " & tmpInst & " for " & tmpFname & " is CANCELED.<br>" & _
-			 "If you have any questions please contact the LanguageBank office immediately at 410-6183 or email us at " & _
-			 "<a href='mailto:info@thelanguagebank.org'>info@thelanguagebank.org</a>.<br>" & _
-			 "E-mail about this cancelation was initiated by " & Session("GreetMe") & ".<br><br>" & _
-			 "Thanks,<br>" & _
-			 "Language Bank"
-		mlMail.HTMLBody = "<html><body>" & vbCrLf & strBody & vbCrLf & "</body></html>"
-		mlMail.Send
-		Set mlMail = Nothing
+				tmpDate & ", " & tmpTime & ", in " & tmpCity & " at " & tmpInst & " for " & tmpFname & " is CANCELED.<br>" & _
+				"If you have any questions please contact the LanguageBank office immediately at 410-6183 or email us at " & _
+				"<a href='mailto:info@thelanguagebank.org'>info@thelanguagebank.org</a>.<br>" & _
+				"E-mail about this cancelation was initiated by " & Session("GreetMe") & ".<br><br>" & _
+				"Thanks,<br>" & _
+				"Language Bank"
+		retItr = zSendMessage(GetPrime2(tmpIntr), "language.services@thelanguagebank.org" _
+				, "Appointment Cancellation " & tmpDate & "; " & tmpTime & ", " & tmpCity & " - " &  tmpInst, strBody)
 	End If
-  	Session("MSG") = "NOTICE: Request has been cancelled." 
-  	 Response.Redirect "reqconfirm.asp?ID=" & Request("ID")
+  	Session("MSG") = "NOTICE: Request has been cancelled (" & retVal & "," & retItr & ")." 
+  	Response.Redirect "reqconfirm.asp?ID=" & Request("ID")
 ElseIf Request("ctrl") = 9 Then 'admin tools - user
  	If Request("selUser") <> 0 Then
  		Set rsUser = Server.CreateObject("ADODB.RecordSet")
@@ -1326,7 +1221,7 @@ ElseIf Request("ctrl") = 10 Then 'delete request
  	Set rsReq = Nothing
  	'CREATE LOG
 	Set fso = CreateObject("Scripting.FileSystemObject")
-	Set LogMe = fso.OpenTextFile("C:\work\lss-lbis\logs.txt", 8, True)
+	Set LogMe = fso.OpenTextFile("C:\work\InterReq\logs.txt", 8, True)
 	strLog = Now & vbtab & "Appointment DELETED ID: " & Request("ID") & " by " & Session("GreetMe")
 	LogMe.WriteLine strLog
 	Set LogMe = Nothing
