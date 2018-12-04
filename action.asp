@@ -101,7 +101,8 @@ If Request("ctrl") = 1 Then 'save new appointment
 		Request("txtdhhsFon") & "|" & Request("txtoLang") & "|" & Request("chkCall2") & "|" & Request("txtchrg") & "|" & Request("txtAtrny") & "|" & _
 		Request("txtDOB") & "|" & Request("txtPDamount") & "|" & Request("h_tmpfilename") & "|" & Request("chkout") & "|" & Request("chkmed") & "|" & _
 		Request("MCnum") & "|" & Request("chkacc") & "|" & Request("chkcomp") & "|" & Request("selIns") & "|" & Request("txtemail") & "|" & _
-		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & Request("chkleave") & "|" & Request("txtCliCir"))
+		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & _
+		Request("chkleave") & "|" & Request("txtCliCir") & "|" & Request("txtccaddr") )
 	'CHECK VALID VALUES
 	If Session("myClass") <> 3 Then
 		If Request("txtTP") <> "" Then
@@ -136,7 +137,7 @@ If Request("ctrl") = 1 Then 'save new appointment
 		'SAVE ENTRIES
 		Set rsMain = Server.CreateObject("ADODB.RecordSet")
 		sqlMain = "SELECT * FROM appointment_T WHERE [timestamp] = '" & now & "'"
-		response.write sqlMain
+		'Response.Write sqlMain
 		rsMain.Open sqlMain, g_strCONN, 1, 3
 		rsMain.AddNew
 		rsMain("timestamp") = tmpTS
@@ -243,6 +244,7 @@ If Request("ctrl") = 1 Then 'save new appointment
 		rsMain("leavemsg") = False
 		If tmpEntry(49) <> "" Then rsMain("leavemsg") = True
 		rsMain("Spec_cir") = tmpEntry(50)
+
 		rsMain("UID") = Session("UID")
 		rsMain.Update
 		'GET ID FOR CONFIRM
@@ -346,8 +348,21 @@ If Request("ctrl") = 1 Then 'save new appointment
 		rsLB("leavemsg") = False
 		If tmpEntry(49) <> "" Then rsLB("leavemsg") = True
 		rsLB("Spec_cir") = tmpEntry(50)
+		strCCAddr = ""
+		If Session("type") = 4 And Not Z_Blank(tmpEntry(51)) Then
+			strCCAddr = LCase(Z_FixNull(tmpEntry(51)))
+			If  (InStr(tmpEntry(51), "@")<2) Then
+				' it's a fax
+				rsLB("cc_addr") = strCCAddr
+				strCCAddr = strCCAddr & "@emailfaxservice.com"
+			Else
+				' e-mail address
+				rsLB("cc_addr") = strCCAddr
+			End If
+		End If
 		rsLB("courtcall") = false
 		If tmpEntry(3) <> "" Then rsLB("courtcall") = True
+			'rsLB("")
 		rsLB.update
 		tmpLBID = rsLB("index")
 		rsLB.Close
@@ -563,12 +578,15 @@ If Request("ctrl") = 1 Then 'save new appointment
 				"</td></tr>" & vbCrLf & _
 				"<tr><td>&nbsp;</td></tr>" & vbCrLf & _
 				"<tr><td align='left'>" & vbCrLf & _
-				"<font size='1' face='trebuchet MS'>* Please do not reply to this email. This is a computer" & _
+				"<font size='1' face='trebuchet MS'>* Please do not reply to this email. This is a computer " & _
 				"generated message. Use the information above for questions.</font>" & vbCrLf & _
 				"</td></tr>" & vbCrLf & _
 				"</table>"
 			strSubj = "Interpreter Request - " & tmpInst & " - " & tmpDept
-			retVal = zSendMessage("language.services@thelanguagebank.org", "", strSubj, strBody)
+			If Session("type") = 4 And Not Z_Blank(strCCAddr) Then
+				strBody = strBody & vbCrLf & "<p>" & "A copy of this message was sent to " & strCCAddr & "</p>" & vbCrLf
+			End If
+			retVal = zSendMessage("language.services@thelanguagebank.org", strCCAddr, strSubj, strBody)
 			Session("MSG") = "Request for Interpreter submitted to LanguageBank. (" & retVal & ")"
 		Call AddLog("Appointment " & tmpID & " EMAIL SENT TO STAFF.")
 		Call AddLog("Appointment " & tmpID & " SUCCESS.")

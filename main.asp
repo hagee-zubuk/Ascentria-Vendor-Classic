@@ -818,8 +818,7 @@ End If
 					}
 					else {
 						var ans = window.confirm("Save Request? Click Cancel to stop.");
-						if (ans)
-						{
+						if (ans) {
 							document.frmMain.saveme.value = 'Please Wait...';
 							<% If Request("ID") = "" Then%>
 								document.frmMain.action = 'action.asp?ctrl=1';
@@ -827,8 +826,7 @@ End If
 								document.frmMain.action = 'action.asp?ctrl=3&ID=' + <%=Request("ID")%>;
 							<% End If %>
 							document.frmMain.submit();
-						}
-						else {
+						} else {
 							document.frmMain.saveme.value = 'Save';
 						}
 					}
@@ -1264,8 +1262,15 @@ End If
 													<input class='main' size='25' maxlength='50' name='txtemail' value='<%=tmpPDemail%>'>
 												</td>
 											</tr>
-										<% End If %>
-									<% End If %>
+										<% End If
+										If Session("type") = 4 Then %>
+											<tr><td align='right' valign="top">CC e-Mail:</td>
+												<td><input autocomplete="off" class="main" size="50" maxlength="50" id="txtccaddr" name="txtccaddr" value="" />
+													<br /><p style="margin-top: 0px; padding-top: 0px;">Specifying and email address or fax number in this field sends a copy of the confirmation to that address</p>
+												</td>
+											</tr>
+									<%	End If
+									End If %>
 									<tr><td>&nbsp;</td></tr>
 									<tr><td colspan='10'><hr align='center' width='75%'></td></tr>
 									<tr><td>&nbsp;</td></tr>
@@ -1428,7 +1433,7 @@ End If
 												<tr>
 													<td align='right'>Docket Number:</td>
 													<td>
-														<input class='main' size='50' maxlength='50' name='txtClinName' value='<%=tmpCli%>'>
+														<input class='main' size='50' maxlength='50' name='txtClinName' value="<%=tmpCli%>">
 													</td>
 												</tr>
 												<tr>
