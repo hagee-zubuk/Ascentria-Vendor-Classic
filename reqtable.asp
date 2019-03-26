@@ -5,16 +5,6 @@
 <!-- #include file="_Security.asp" -->
 <!-- #include file="_UtilCalendar.asp" -->
 <%
-Function UseXRTable(uid) 
-	UseXRTable = False
-	Set rsXR = Server.CreateObject("ADODB.RecordSet")
-	rsXR.Open "SELECT COUNT([user_id]) AS [cnt] FROM [xr_user_dept] WHERE [user_id]=" & uid , g_strCONN, 3, 1
-	If Not rsXR.EOF Then
-		UseXRTable = CBool(rsXR("cnt") > 0)
-	End If
-	rsXR.Close
-	Set rsXR = Nothing
-End Function
 Function Z_FormatTime(xxx)
 	Z_FormatTime = Null
 	If xxx <> "" Or Not IsNull(xxx)  Then
@@ -46,18 +36,11 @@ radioUnass = ""
 x = 0
 If Request.ServerVariables("REQUEST_METHOD") = "POST"  Or Request("action") = 3 Then
 	Call AddLog("FIND INITIATED... ")
-	If Session("type") = 0 Or Session("type") = 4 Then
-		blnXRZ = UseXRTable(Session("UID"))
-		If blnXRZ Then
-			sqlReq = "SELECT * FROM Appointment_T AS a INNER JOIN [xr_user_dept] AS d ON a.[DeptID]=d.[dept_id] " & _
-					"AND d.[user_id]=" & Session("UID") & _
-					" WHERE InstID = " & Session("InstID")
-		Else
-			sqlReq = "SELECT * FROM Appointment_T WHERE InstID = " & Session("InstID")
-		End If
-	ElseIf Session("type") = 3 Then
+	'If Session("type") = 0 Or Session("type") = 4 Then
+	''	sqlReq = "SELECT * FROM Appointment_T WHERE InstID = " & Session("InstID")
+	'ElseIf Session("type") = 3 Then
 		sqlReq = "SELECT * FROM Appointment_T WHERE DeptID = " & Session("DeptID")
-	End If
+	'End If
 	'FIND
 	If Request("radioStat") = 0 Then
 		radioApp = "checked"
@@ -114,7 +97,7 @@ If Request.ServerVariables("REQUEST_METHOD") = "POST"  Or Request("action") = 3 
 'GET REQUESTS
 Call AddLog("FIND: " & sqlReq)
 Set rsReq = Server.CreateObject("ADODB.RecordSet")
-
+'Response.Write sqlReq
 rsReq.Open sqlReq, g_strCONN, 3, 1
 x = 1
 If Not rsReq.EOF Then

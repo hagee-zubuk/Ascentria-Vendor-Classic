@@ -30,22 +30,15 @@ Function GetClass2(xxx)
 End function
 ValidAko = False
 Set rsUser = Server.CreateObject("ADODB.RecordSet")
-strUName = UCase(Z_CleanName(Request("txtUN")))	' avoid sql injection
-sqlUser = "SELECT * FROM User_t WHERE upper([User]) = '" & strUName & "' "
+sqlUser = "SELECT * FROM User_t WHERE upper([User]) = '" & UCase(Request("txtUN")) & "' "
 rsUser.Open sqlUser, g_strCONN, 3, 1
-response.write sqlUser
+'Response.write sqlUser
 If Not rsUser.EOF Then
 	If Request("txtPW") = Z_DoDecrypt(rsUser("pass")) Then 
 		Session("type") = rsUser("type")
 		Session("UID") =  rsUser("index")
 		Session("GreetMe") = rsUser("lname")
 		If rsUser("fname") <> "" Then Session("GreetMe") = Session("GreetMe") & ",  " & rsUser("fname")
-		' WHAT DO THESE TYPES MEAN?? 
-		' 2 is admin
-		' 3 looks like hmo/hospitals
-		' 4 looks like courts
-		' 5 are nh public defenders
-		' 6 is... dunno - AOC?
 		If rsUser("type") = 0 Or rsUser("type") = 3  Or rsUser("type") = 4 Or rsUser("type") = 5 Then 
 			Session("DeptID") = rsUser("DeptLB")
 			Session("ReqID") = rsUser("ReqLB")
@@ -80,7 +73,7 @@ If Not rsUser.EOF Then
 		Session("MSG") = "ERROR: Invalid username and/or password."
 	End If
 Else
-	Session("MSG") = "ERROR: Username and/or password invalid."
+	Session("MSG") = "ERROR: Invalid username and/or password."
 End If
 rsUser.Close
 Set rsUser = Nothing
@@ -89,9 +82,9 @@ Set rsUser = Nothing
 <%
 If ValidAko = True Then
 	If Session("type") = 0 Or Session("type") = 4 Or Session("type") = 5 Or Session("type") = 6 Then
-		If Session("UID") <> 36 Then	
+		If Session("UID") <> 36 Then
 			Response.Redirect "calendarview2.asp"	
-		Else ' this does NOT happen!
+		Else
 			Response.Redirect "main.asp"
 		End If
 	ElseIf Session("type") = 1 Then 
@@ -101,7 +94,7 @@ If ValidAko = True Then
 	ElseIf Session("type") = 3 Then 
 		Response.Redirect "calendarview2.asp"
 	End If
-Else ' go back to the login screen, which could be sql injected
+Else
 	Response.Redirect "default.asp"
 End If
 %>

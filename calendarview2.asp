@@ -5,25 +5,6 @@
 <!-- #include file="_Security.asp" -->
 <!-- #include file="_UtilCalendar.asp" -->
 <%
-Function SupXREnt(blnPT, intUID, intDep)
-	SupXREnt=  True
-	If Not blnPT Then Exit Function
-	Set rsXR = Server.CreateObject("ADODB.RecordSet")
-	rsXR.Open "SELECT [dept_id] FROM [xr_user_dept] WHERE [dept_id]=" & intDep & " AND [user_id]=" & intUID , g_strCONN, 3, 1
-	SupXREnt = Not rsXR.EOF
-	rsXR.Close
-	Set rsXR = Nothing
-End Function
-Function UseXRTable(uid) 
-	UseXRTable = False
-	Set rsXR = Server.CreateObject("ADODB.RecordSet")
-	rsXR.Open "SELECT COUNT([user_id]) AS [cnt] FROM [xr_user_dept] WHERE [user_id]=" & uid , g_strCONN, 3, 1
-	If Not rsXR.EOF Then
-		UseXRTable = CBool(rsXR("cnt") > 0)
-	End If
-	rsXR.Close
-	Set rsXR = Nothing
-End Function
 Function IsBlock(xxx)
 	IsBlock = False
 	Set rsUser = Server.CreateObject("ADODB.RecordSet")
@@ -65,7 +46,6 @@ Function MyStatus(xxx)
 			MyStatus = ""
 	End Select
 End Function
-
 If Session("type") = 1 Then HPID = GetHPID(Session("UID"))
 CalendarPage = True
 tmpReqMonth = Request("selMonth")
@@ -186,20 +166,19 @@ Else
 	If Request("appdate") <> "" Then tmpDate = Request("appdate")
 End If
 Set rsReq = Server.CreateObject("ADODB.RecordSet")
-'Response.Write "TYPE:" & Session("type") & "<br />"
 If Session("type") = 0 Or Session("type") = 4 Or Session("type") = 5 Then
 	'If GetInstID(Session("UID")) = 4 Or GetInstID(Session("UID")) = 6 Or GetInstID(Session("UID")) = 7 Then 'FOR SNHMC
 	If Session("InstID") = 93 Then
 		sqlReq = "SELECT * FROM appointment_T WHERE appDate = '" & tmpDate & "' AND InstID = 93 ORDER BY TimeFrom"
 	ElseIf Session("UID") = 509 Or Session("UID") = 510 Then 'special rule for user 509 and 510
 		sqlReq = "SELECT * FROM appointment_T WHERE appDate = '" & tmpDate & "' AND " & _
-			"(DeptID = 2306 OR DeptID = 373 OR DeptID = 946 OR DeptID = 2302) ORDER BY TimeFrom"
+				"(DeptID = 2306 OR DeptID = 373 OR DeptID = 946 OR DeptID = 2302) ORDER BY TimeFrom"
 	ElseIf Session("UID") = 517 Or Session("UID") = 534 Then 'special rule for user 517 and 534
 		sqlReq = "SELECT * FROM appointment_T WHERE appDate = '" & tmpDate & "' AND " & _
-			"(DeptID = 446 OR DeptID = 322 OR DeptID = 289) ORDER BY TimeFrom"
+				"(DeptID = 446 OR DeptID = 322 OR DeptID = 289) ORDER BY TimeFrom"
 	ElseIf Session("UID") = 625 Or Session("UID") = 626 Or Session("UID") = 627 Or Session("UID") = 628 Then 'special rule for user 625 - 628
 		sqlReq = "SELECT * FROM appointment_T WHERE appDate = '" & tmpDate & "' AND " & _
-			"(DeptID = 2466 OR DeptID = 2465) ORDER BY TimeFrom"
+				"(DeptID = 2466 OR DeptID = 2465) ORDER BY TimeFrom"
 	Else
 		sqlReq = "SELECT * FROM appointment_T WHERE appDate = '" & tmpDate & "' AND InstID = " & Session("InstID") & " ORDER BY TimeFrom"
 	End If
@@ -209,6 +188,9 @@ ElseIf Session("type") = 2 Then
 	sqlReq = "SELECT * FROM appointment_T WHERE appDate = '" & tmpDate & "' ORDER BY TimeFrom"
 ElseIf Session("type") = 3 Then
 	sqlReq = "SELECT * FROM appointment_T WHERE appDate = '" & tmpDate & "' AND DeptID = " & Session("DeptID") & " ORDER BY TimeFrom"
+	sqlReq = "SELECT * FROM [appointment_T] WHERE [appDate] = '" & tmpDate & "'	AND [DeptId] IN (" & _
+			"SELECT [Dept_id] FROM [xr_user_dept] WHERE [user_id]=" & Session("UID") & " UNION SELECT " & _
+			Session("DeptID") & ") ORDER BY [TimeFrom]"
 ElseIf Session("type") = 6 Then
 	Set fso = CreateObject("Scripting.FileSystemObject")
 	Set oFile = fso.OpenTextFile(crtLst, 1)
@@ -222,11 +204,9 @@ ElseIf Session("type") = 6 Then
 	sqlReq = "SELECT * FROM appointment_T WHERE appDate = '" & tmpDate & "' AND (" & sqlInst & ") ORDER BY TimeFrom"
 End If
 rsReq.Open sqlReq, g_strCONN, 3, 1
-' Response.Write "<code>" & sqlReq & "</code><br />User: " & rsReq("UID") & "|" & Session("UID") & "<br />"
-blnXRZ = UseXRTable( Session("UID") ) 
 If Not rsReq.EOF Then
 	Do Until rsReq.EOF
-		If (Not Z_HideApp(rsReq("UID")) Or Session("type") = 3) And SupXREnt(blnXRZ, Session("UID"), rsReq("DeptID")) Then
+		If Not Z_HideApp(rsReq("UID")) Or Session("type") = 3 Then
 			tmpInst = GetFacility(rsReq("InstID")) & " - " & GetDept(rsReq("DeptID"))
 			'If Session("type") <> 1 Then
 			'response.write "IntrID: " & rsReq("IntrID") & "<br>"
@@ -445,7 +425,6 @@ Set rsReq = Nothing
 			onload='PopMe(<%=Request("rpt")%>);'
 		<%End If%>
 		>
-		<!-- Inst: <%=Session("InstID")%>, Type: <%=Session("Type")%> -->
 		<form method='post' name='frmCal'>
 			<table cellSpacing='0' cellPadding='0' height='100%' width="100%" border='0' class='bgstyle2'>
 				<tr>

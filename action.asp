@@ -87,8 +87,11 @@ Function GetLBLang(xxx)
 	rsLang.Close
 	Set rsLang = Nothing
 End Function
+
+strCCAddr = ""
 If Request("ctrl") = 1 Then 'save new appointment
 	tmpTS = Now
+	Server.ScriptTimeout = 3600
 	'STORE ENTRIES ON COOKIE FOR EDITING AND SAVING ENTRIES
 	Response.Cookies("LBREQUEST") = Z_DoEncrypt(Request("txtClilname")	& "|" & _
 		Request("txtClifname")	& "|" & Request("selReas")	& "|" & Request("chkCall")	& "|" & Request("selDept")	& "|" & _
@@ -349,16 +352,20 @@ If Request("ctrl") = 1 Then 'save new appointment
 		If tmpEntry(49) <> "" Then rsLB("leavemsg") = True
 		rsLB("Spec_cir") = tmpEntry(50)
 		strCCAddr = ""
-		If Session("type") = 4 And Not Z_Blank(tmpEntry(51)) Then
-			strCCAddr = LCase(Z_FixNull(tmpEntry(51)))
-			If  (InStr(tmpEntry(51), "@")<2) Then
-				' it's a fax
-				rsLB("cc_addr") = strCCAddr
-				strCCAddr = strCCAddr & "@emailfaxservice.com"
-			Else
-				' e-mail address
-				rsLB("cc_addr") = strCCAddr
-			End If
+		If UBound(tmpEntry)>=51 Then
+			If Session("type") = 4 And Not Z_Blank(tmpEntry(51)) Then
+				strCCAddr = LCase(Z_FixNull(tmpEntry(51)))
+				If Len(strCCAddr) > 5 Then
+					If  (InStr(tmpEntry(51), "@")<2) Then
+						' it's a fax
+						rsLB("cc_addr") = strCCAddr
+						strCCAddr = strCCAddr & "@emailfaxservice.com"
+					Else
+						' e-mail address
+						rsLB("cc_addr") = strCCAddr
+					End If
+				End If
+			End If				
 		End If
 		rsLB("courtcall") = false
 		If tmpEntry(3) <> "" Then rsLB("courtcall") = True

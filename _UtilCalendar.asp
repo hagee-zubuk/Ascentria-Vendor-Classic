@@ -165,7 +165,7 @@ Function Z_EmailJob(AppID)
 	tmpAvail = Weekday(AppDate) & "," & Hour(appTimeFrom)
 	appTimeTo = Z_GetInfoFROMAppID(appID, "appTimeTo")
 	Set rsIntr = Server.CreateObject("ADODB.RecordSet")
-	sqlIntr = "SELECT [index] as myIntrID, [e-mail], Phone1, sendonce FROM interpreter_T WHERE" & classSql & " AND" & LangSQL
+	sqlIntr = "SELECT [index] as myIntrID, [e-mail], Phone1, sendonce FROM interpreter_T WHERE " & classSql & " AND" & LangSQL
 	rsIntr.Open sqlIntr, g_strCONNLB, 1, 3
 	Do Until rsIntr.EOF
 		If Not OnVacation(rsIntr("myIntrID"), AppDate) Then

@@ -1,4 +1,4 @@
-<%language=vbscript%>
+<%Language=VBScript%>
 <!-- #include file="_Files.asp" -->
 <!-- #include file="_Announce.asp" -->
 <!-- #include file="_Utils.asp" -->
@@ -23,6 +23,7 @@ radioLang2 = ""
 myStat = 0
 billedako = False
 Billedna = ""
+
 'EDIT APPOINTMENT
 If Request("ID") <> "" Then
 	EditPage = " - Edit"
@@ -141,6 +142,7 @@ If Request("ID") <> "" Then
 		Response.Redirect "default.asp"
 	End If
 End If
+
 If Session("MSG") <> "" And Request("ID") = "" Then
 	tmpEntry = Split(Z_DoDecrypt(Request.Cookies("LBREQUEST")), "|")
 	tmpClname = tmpEntry(0)
@@ -401,11 +403,22 @@ If Session("type") <> 3 Then
 	Loop
 	rsDept.Close
 	Set rsDept = Nothing
-
 Else
+	sqlDept = "SELECT d.[index], d.[dept], d.[BLname]" & _
+		", d.[address], d.[BAddress]" & _
+		", d.[InstAdrI], d.[drg]" & _
+		", d.[City], d.[BCity]" & _
+		", d.[State], d.[Bstate]" & _
+		", d.[Zip], d.[BZip]" & _
+		" FROM [interpreterSQL].[dbo].[xr_user_dept] AS x INNER JOIN [langbank].[dbo].[dept_T] AS d ON x.[dept_id]=d.[index] " & _
+		" WHERE x.[user_id]=" & Session("UID")
 	Set rsDept = Server.CreateObject("ADODB.RecordSet")
-	sqlDept = "SELECT * FROM Dept_T WHERE [index] = " & Session("DeptID") & " ORDER BY dept"
 	rsDept.Open sqlDept, g_strCONNLB, 3, 1
+	If rsDept.EOF Then
+		sqlDept = "SELECT * FROM Dept_T WHERE [index] = " & Session("DeptID") & " ORDER BY dept"
+		rsDept.Close
+		rsDept.Open sqlDept, g_strCONNLB, 3, 1
+	End If
 	Do Until rsDept.EOF
 		tmpSelDept = ""
 		tmpDept = Session("DeptID") 
@@ -426,6 +439,7 @@ Else
 	rsDept.Close
 	Set rsDept = Nothing
 End If
+
 'GET REQUESTER INFO V.2
 Set rsRP = Server.CreateObject("ADODB.RecordSet")
 sqlRP  = "SELECT Email, phone, pExt, fax FROM Requester_T WHERE [index] = " & Session("ReqID")
@@ -1266,7 +1280,7 @@ End If
 										If Session("type") = 4 Then %>
 											<tr><td align='right' valign="top">CC e-Mail:</td>
 												<td><input autocomplete="off" class="main" size="50" maxlength="50" id="txtccaddr" name="txtccaddr" value="" />
-													<br /><p style="margin-top: 0px; padding-top: 0px;">Specifying and email address or fax number in this field sends a copy of the confirmation to that address</p>
+													<br /><p style="margin-top: 0px; padding-top: 0px;">Specifying an email address or fax number in this field sends a copy of the confirmation to that address</p>
 												</td>
 											</tr>
 									<%	End If
