@@ -36,11 +36,11 @@ radioUnass = ""
 x = 0
 If Request.ServerVariables("REQUEST_METHOD") = "POST"  Or Request("action") = 3 Then
 	Call AddLog("FIND INITIATED... ")
-	'If Session("type") = 0 Or Session("type") = 4 Then
-	''	sqlReq = "SELECT * FROM Appointment_T WHERE InstID = " & Session("InstID")
-	'ElseIf Session("type") = 3 Then
+	If Session("type") = 0 Or Session("type") = 4 Then
+		sqlReq = "SELECT * FROM Appointment_T WHERE InstID = " & Session("InstID")
+	Else 'If Session("type") = 3 Then
 		sqlReq = "SELECT * FROM Appointment_T WHERE DeptID = " & Session("DeptID")
-	'End If
+	End If
 	'FIND
 	If Request("radioStat") = 0 Then
 		radioApp = "checked"
