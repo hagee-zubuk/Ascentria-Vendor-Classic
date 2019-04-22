@@ -194,8 +194,11 @@ If Request("ctrl") = 1 Then 'save new appointment
 		If tmpEntry(31) <> "" Then rsMain("block") = true 'tmpLBCOM = "BLOCK SCHEDULE  "
 		rsMain("lbcom") = tmpEntry(18)
 		rsMain("intrcom") = tmpEntry(19)
-		rsMain("Gender") = tmpEntry(20)
-		
+		If Z_CLng(tmpEntry(20)) < 0 Then
+			rsMain("Gender") = vbNull
+		Else
+			rsMain("Gender") = tmpEntry(20)
+		End If
 		If tmpEntry(21) <> "" Then 
 			rsMain("useCadr") = True
 			rsMain("capt") = tmpEntry(22)
@@ -297,7 +300,12 @@ If Request("ctrl") = 1 Then 'save new appointment
 		rsLB("CAphone") =  tmpEntry(6)
 		rsLB("LBcomment") = tmpEntry(18)
 		rsLB("Intrcomment") = tmpEntry(19)
-		rsLB("Gender") = tmpEntry(20)
+		If Z_CLng(tmpEntry(20)) < 0 Then
+			rsLB("Gender") = vbNull
+		Else
+			rsLB("Gender") = tmpEntry(20)
+		End If
+
 		rsLB("Child") = False
 		If tmpEntry(15) <> "" Then rsLB("Child") = True
 		If tmpEntry(21) <> "" Then 
@@ -808,7 +816,11 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 			rsMain("parents") = tmpEntry(16)
 			rsMain("lbcom") = tmpEntry(17)
 			rsMain("intrcom") = tmpEntry(18)
-			rsMain("Gender") = tmpEntry(19)
+			If tmpEntry(19) < 0 Then
+				rsMain("Gender") = vbNull
+			Else
+				rsMain("Gender") = tmpEntry(19)
+			End If
 		If tmpEntry(20) <> "" Then 
 			rsMain("useCadr") = True
 			rsMain("capt") = tmpEntry(21)
@@ -896,7 +908,11 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 			rsLB("CAphone") =  tmpEntry(6)
 			'rsLB("LBcomment") = tmpEntry(17)
 			rsLB("Intrcomment") = tmpEntry(18)
-			rsLB("Gender") = tmpEntry(19)
+			If tmpEntry(19) < 0 Then
+				rsLB("Gender") = vbNull
+			Else
+				rsLB("Gender") = tmpEntry(19)
+			End If
 			rsLB("DOB") = Z_dateNull(tmpEntry(33))
 		If tmpEntry(20) <> "" Then 
 			rsLB("CliAdd") = True

@@ -74,11 +74,7 @@ End Function
 'rsInst.Close
 'Set rsInst = Nothing
 'GET INST and DEPTV2
-If (Session("InstID") = 860) Then
-	strNewReqLink = "main_min.asp"
-Else
-	strNewReqLink = "main.asp"
-End If
+lngReqID = Z_CLng(Request("ID"))
 Set rsInst = Server.CreateObject("ADODB.RecordSet")
 sqlInst = "SELECT * FROM Appointment_T WHERE [index] = " & Request("ID")
 rsInst.Open sqlInst, g_strCONN, 3, 1
@@ -167,11 +163,15 @@ If Not rsApp.EOF Then
 	End If
 	tmpLBCom = rsApp("lbcom")
 	tmpIntrCom = rsApp("intrcom")
-	tmpGender	= Z_CZero(rsApp("Gender"))
-	If tmpGender = 0 Then 
-		tmpSex = "MALE"
+	If rsApp("Gender") = vbNull Then
+		tmpSex = "Unknown"
 	Else
-		tmpSex = "FEMALE"
+		tmpGender	= Z_CZero(rsApp("Gender"))
+		If tmpGender = 0 Then 
+			tmpSex = "MALE"
+		ElseIf tmpGender = 1 Then 
+			tmpSex = "FEMALE"
+		End If
 	End If
 	tmpCAddress = rsApp("capt") & ", " & rsApp("caddress") & ", " & rsApp("ccity") & ", " & rsApp("cstate") & ", " & rsApp("czip")
 	myInst = rsApp("InstLB")
@@ -255,7 +255,7 @@ End If
 		}
 		function CloneMe(xxx)
 		{
-			document.frmConfirm.action = "<%=strNewReqLink%>?clone=" + xxx;
+			document.frmConfirm.action = "main.asp?clone=" + xxx;
 			document.frmConfirm.submit();
 		}
 		function PrintMe(xxx)
@@ -266,6 +266,21 @@ End If
 		function mySurvey(xxx) {
 			newwindow = window.open('survey.asp?ID=' + xxx ,'','height=800,width=900,scrollbars=1,directories=0,status=0,toolbar=0,resizable=1');
 			if (window.focus) {newwindow.focus()}
+		}
+		function uploadFile() {
+<%
+If Session("type") = 5 Then 'create temp filename
+	tmpFilename = Z_GenerateGUID()
+	Do Until GUIDExists(tmpFilename) = False
+		tmpFilename = Z_GenerateGUID()
+	Loop
+Else
+	tmpFilename = "UNUSED"
+End If
+%>
+			var tmpfname = "<%=tmpFilename%>";
+			newwindow = window.open('upload2.asp?rid=<%=lngReqID%>&hfname=<%=tmpFilename%>','name','height=150,width=400,scrollbars=1,directories=0,status=1,toolbar=0,resizable=0');
+				if (window.focus) {newwindow.focus()}
 		}
 		-->
 		</script>
@@ -487,7 +502,10 @@ End If
 									</tr>
 									<tr>
 										<td align='right'>&nbsp;</td>
-										<td class='confirm'><%=uploadfileviewLB%></td>
+										<td class='confirm'><%=uploadfileviewLB%>
+											<br />
+											<input type="button" name="btnUp" value="UPLOAD" onclick="uploadFile();" class='btn' onmouseover="this.className='hovbtn'" onmouseout="this.className='btn'" <%=disUpload%>>
+										</td>
 									</tr>
 							<% End If %>
 							<tr><td>&nbsp;</td></tr>
@@ -525,7 +543,7 @@ End If
 								<td colspan='2' align='center' height='100px' valign='bottom'>
 									<input class='btn' type='button' style='width: 125px;' value='View in Calendar' onmouseover="this.className='hovbtn'" onmouseout="this.className='btn'" onclick="document.location='calendarview2.asp?appdate=<%=tmpAppDate%>'">
 									<% If Session("type") = 0 Or Session("type") = 3 Or Session("type") = 4 Or Session("type") = 5 Then %>
-										<input class='btn' type='button' style='width: 125px;' value='Edit' onmouseover="this.className='hovbtn'" onmouseout="this.className='btn'" onclick="document.location='<%=strNewReqLink%>?ID=<%=Request("ID")%>';" <%=LockMe%>>
+										<input class='btn' type='button' style='width: 125px;' value='Edit' onmouseover="this.className='hovbtn'" onmouseout="this.className='btn'" onclick="document.location='main.asp?ID=<%=Request("ID")%>';" <%=LockMe%>>
 										<input class='btn' type='button' style='width: 125px;' value='Cancel Appt.' onmouseover="this.className='hovbtn'" onmouseout="this.className='btn'" onclick='CancelMe(<%=Request("ID")%>, <%=tmpstat2%>);' <%=LockMe%>>
 										<% If Session("InstID") = 108 Or Session("myClass") = 3 Then %>	
 											<input class='btn' type='button' style='width: 125px;' value='Print' onmouseover="this.className='hovbtn'" onmouseout="this.className='btn'" onclick='PrintMe(<%=Request("ID")%>);'>

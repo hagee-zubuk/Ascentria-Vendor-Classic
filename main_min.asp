@@ -56,13 +56,15 @@ If Request("ID") <> "" Then
 		tmpreqname = rsApp("reqname") 
 		tmpLBcom = rsApp("lbcom") 
 		tmpIntrcom = rsApp("intrcom") 
-		tmpGender	= Z_CZero(rsApp("Gender"))
-		tmpMale = ""
-		tmpFemale = ""
-		If tmpGender = 0 Then 
-			tmpMale = "SELECTED"
-		Else
-			tmpFemale = "SELECTED"
+		If rsApp("Gender") <> vbNull Then
+			tmpGender	= Z_CZero(rsApp("Gender"))
+			tmpMale = ""
+			tmpFemale = ""
+			If tmpGender = 0 Then 
+				tmpMale = "SELECTED"
+			ElseIf tmpGender = 1 Then 
+				tmpFemale = "SELECTED"
+			End If
 		End If
 		tmpDOB = rsApp("DOB") 
 		tmpCAdrI =  rsApp("capt")
@@ -143,13 +145,15 @@ If Session("MSG") <> "" And Request("ID") = "" Then
 	If tmpEntry(15) <> "" Then tmpminor = "checked"
 	tmppar = tmpEntry(16)
 	tmpreqname = tmpEntry(17)
-	tmpGender	= Z_CZero(tmpEntry(20))
-	tmpMale = ""
-	tmpFemale = ""
-	If tmpGender = 0 Then 
-		tmpMale = "SELECTED"
-	Else
-		tmpFemale = "SELECTED"
+	If tmpEntry(20) >= 0 Then
+		tmpGender	= Z_CZero(tmpEntry(20))
+		tmpMale = ""
+		tmpFemale = ""
+		If tmpGender = 0 Then 
+			tmpMale = "SELECTED"
+		ElseIf tmpGender = 1 Then 
+			tmpFemale = "SELECTED"
+		End If
 	End If
 	tmpDOB = tmpEntry(34)
 	tmpCAdrI =  tmpEntry(22)
@@ -206,14 +210,15 @@ If Request("Clone") <> "" Then
 		tmpIntr = rsClone("IntrID")
 		tmpCom = rsClone("Comment")
 		tmpReas = rsClone("Reason")
-		
-		tmpGender	= Z_CZero(rsClone("Gender"))
-		tmpMale = ""
-		tmpFemale = ""
-		If tmpGender = 0 Then 
-			tmpMale = "SELECTED"
-		Else
-			tmpFemale = "SELECTED"
+		If rsClone("Gender") <> vbNull Then
+			tmpGender	= Z_CZero(rsClone("Gender"))
+			tmpMale = ""
+			tmpFemale = ""
+			If tmpGender = 0 Then 
+				tmpMale = "SELECTED"
+			ElseIf tmpGender = 1 Then 
+				tmpFemale = "SELECTED"
+			End If
 		End If
 		tmpCall = "checked"
 		If rsClone("callme") = False Then tmpCall = ""
@@ -689,6 +694,7 @@ function chkLang() {
 										<td align='right'>Gender:</td>
 										<td>
 											<select class='seltxt' name='selGen' style='width: 75px;'>
+												<option value='-1' > &nbsp; </option>
 												<option value='0' <%=tmpMale%>>Male</option>
 												<option value='1' <%=tmpfeMale%>>Female</option>
 											</select>
