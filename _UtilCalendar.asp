@@ -1,6 +1,6 @@
 <%
 Function AddLog(strmsg)
-	tmpPath = "C:\WORK\InterReq\log\"
+	tmpPath = "C:\WORK\Ascentria\Temp\vendor\log\"
 	tmpFile = Replace(Date, "/", "") 
 	Set fso = CreateObject("Scripting.FileSystemObject")
 	Set oFile = fso.OpenTextFile(tmpPath & tmpFile & ".log", 8, True)
