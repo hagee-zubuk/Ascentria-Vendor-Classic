@@ -178,7 +178,7 @@ If Session("type") = 0 Or Session("type") = 4 Or Session("type") = 5 Then
 				"(DeptID = 446 OR DeptID = 322 OR DeptID = 289) ORDER BY TimeFrom"
 	ElseIf Session("UID") = 625 Or Session("UID") = 626 Or Session("UID") = 627 Or Session("UID") = 628 Then 'special rule for user 625 - 628
 		sqlReq = "SELECT * FROM appointment_T WHERE appDate = '" & tmpDate & "' AND " & _
-				"(DeptID = 2466 OR DeptID = 2465) ORDER BY TimeFrom"
+				"(DeptID = 2466 OR DeptID = 2465 OR DeptID = 3434) ORDER BY TimeFrom"
 	Else
 		sqlReq = "SELECT * FROM appointment_T WHERE appDate = '" & tmpDate & "' AND InstID = " & Session("InstID") & " ORDER BY TimeFrom"
 	End If
