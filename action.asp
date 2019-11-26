@@ -105,7 +105,7 @@ If Request("ctrl") = 1 Then 'save new appointment
 		Request("txtDOB") & "|" & Request("txtPDamount") & "|" & Request("h_tmpfilename") & "|" & Request("chkout") & "|" & Request("chkmed") & "|" & _
 		Request("MCnum") & "|" & Request("chkacc") & "|" & Request("chkcomp") & "|" & Request("selIns") & "|" & Request("txtemail") & "|" & _
 		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & _
-		Request("chkleave") & "|" & Request("txtCliCir") & "|" & Request("txtccaddr") )
+		Request("chkleave") & "|" & Request("txtCliCir") & "|" & Request("txtccaddr") & "|" & Request("AHMIdNum")	)
 	'CHECK VALID VALUES
 	If Session("myClass") <> 3 Then
 		If Request("txtTP") <> "" Then
@@ -238,6 +238,7 @@ If Request("ctrl") = 1 Then 'save new appointment
 		rsMain("meridian") = tmpEntry(44)
 		rsMain("nhhealth") = tmpEntry(45)
 		rsMain("wellsense") = tmpEntry(46)
+		rsMain("amerihealth") = tmpEntry(52)
 		rsMain("acknowledge") = false
 		If tmpEntry(47) <> "" Then rsMain("acknowledge") = True
 		rsMain("autoacc") = False
@@ -345,6 +346,7 @@ If Request("ctrl") = 1 Then 'save new appointment
 		rsLB("meridian") = tmpEntry(44)
 		rsLB("nhhealth") = tmpEntry(45)
 		rsLB("wellsense") = tmpEntry(46)
+		rsLB("amerihealth") = tmpEntry(52)
 		rsLB("acknowledge") = false
 		If tmpEntry(47) <> "" Then rsLB("acknowledge") = True
 		rsLB("autoacc") = False
@@ -725,7 +727,8 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		Request("txtdhhsFon") & "|" & Request("txtoLang") & "|" & Request("chkCall2") & "|" & Request("txtchrg") & "|" & Request("txtAtrny") & "|" & _
 		Request("txtDOB") & "|" & Request("txtPDamount") & "|" & Request("h_tmpfilename") & "|" & Request("chkout") & "|" & Request("chkmed") & "|" & _
 		Request("MCnum") & "|" & Request("chkacc") & "|" & Request("chkcomp") & "|" & Request("selIns") & "|" & Request("txtemail") & "|" & _
-		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & Request("chkleave") & "|" & Request("txtCliCir"))
+		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & _
+		Request("chkleave") & "|" & Request("txtCliCir") & "|" & Request("AHMIdNum")	)
 	'CHECK VALID VALUES
 	If Session("myClass") <> 3 Then
 		If Request("txtTP") <> "" Then
@@ -858,6 +861,7 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		rsMain("meridian") = tmpEntry(43)
 		rsMain("nhhealth") = tmpEntry(44)
 		rsMain("wellsense") = tmpEntry(45)
+		rsMain("amerihealth") = tmpEntry(50)
 		rsMain("acknowledge") = false
 		If tmpEntry(46) <> "" Then rsMain("acknowledge") = True
 		rsMain("autoacc") = False
@@ -952,6 +956,7 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		rsLB("meridian") = tmpEntry(43)
 		rsLB("nhhealth") = tmpEntry(44)
 		rsLB("wellsense") = tmpEntry(45)
+		rsLB("amerihealth") = tmpEntry(50)
 		rsLB("acknowledge") = false
 		If tmpEntry(46) <> "" Then rsLB("acknowledge") = True
 		rsLB("autoacc") = False
@@ -1059,7 +1064,7 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		End If
 		'log edit
 		Set fso = CreateObject("Scripting.FileSystemObject")
-		Set LogMe = fso.OpenTextFile("C:\work\interreq\log\editlogs.txt", 8, True)
+		Set LogMe = fso.OpenTextFile("C:\WORK\ascentria\vendor\log\editlogs.txt", 8, True)
 		strLog = Now & vbtab & "Appointment EDITED - ID: " & tmpLBID & " by " & Session("GreetMe") & " DATE: " & tmpAppDate & " TIME: " & tmpAppTime
 		LogMe.WriteLine strLog
 		Set LogMe = Nothing
@@ -1437,7 +1442,8 @@ ElseIf Request("ctrl") = 17 Then
 		Request("txtClistate")	& "|" & Request("txtCliZip") & "|" & Request("txtRFon") & "|" & Request("txtdhhsemail") & "|" & _
 		Request("txtdhhsFon") & "|" & Request("txtoLang") & "|" & Request("chkCall2") & "|" & Request("txtchrg") & "|" & Request("txtAtrny") & "|" & _
 		Request("txtDOB") & "|" & Request("txtPDamount") & "|" & Request("h_tmpfilename") & "|" & Request("chkout") & "|" & Request("chkmed") & "|" & _
-		Request("MCnum") & "|" & Request("chkacc") & "|" & Request("chkcomp") & "|" & Request("selIns") & "|" & Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk"))
+		Request("MCnum") & "|" & Request("chkacc") & "|" & Request("chkcomp") & "|" & Request("selIns") & "|" & Request("MHPnum") & "|" & _
+		Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")	& "|" & Request("AHMIdNum") )
 	If Request("txtDOB") <> "" Then
 		If Not IsDate(Request("txtDOB")) Then Session("MSG") = Session("MSG") & "<br>ERROR: Invalid Date of Birth."
 	End If
@@ -1463,6 +1469,7 @@ ElseIf Request("ctrl") = 17 Then
 			rsMain("meridian") = tmpEntry(42)
 			rsMain("nhhealth") = tmpEntry(43)
 			rsMain("wellsense") = tmpEntry(44)
+			rsMain("amerihealth") = tmpEntry(46)
 			rsMain("acknowledge") = false
 			If tmpEntry(45) <> "" Then rsMain("acknowledge") = True
 			rsMain.Update
@@ -1489,6 +1496,7 @@ ElseIf Request("ctrl") = 17 Then
 			rsLB("meridian") = tmpEntry(42)
 			rsLB("nhhealth") = tmpEntry(43)
 			rsLB("wellsense") = tmpEntry(44)
+			rsLB("amerihealth") = tmpEntry(46)
 			rsLB("acknowledge") = false
 			If tmpEntry(45) <> "" Then rsLB("acknowledge") = True
 			rsLB.Update

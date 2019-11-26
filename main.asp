@@ -111,6 +111,10 @@ If Request("ID") <> "" Then
 			MCNum = rsApp("medicaid")
 			'radiomed4 = "checked"
 		End If
+		If Trim(rsApp("amerihealth")) <> "" Then
+			AHMIdNum = rsApp("amerihealth")
+			radiomed5 = "checked"
+		End If
 		If Trim(rsApp("meridian")) <> "" Then
 			MHPnum = rsApp("meridian")
 			radiomed1 = "checked"
@@ -288,6 +292,10 @@ If Request("Clone") <> "" Then
 			MCNum = rsClone("medicaid")
 			'radiomed4 = "checked"
 		End If
+		If Trim(rsClone("amerihealth")) <> "" Then
+			AHMIdNum = rsClone("amerihealth")
+			radiomed5 = "checked"
+		End If
 		If Trim(rsClone("meridian")) <> "" Then
 			MHPnum = rsClone("meridian")
 			radiomed1 = "checked"
@@ -328,30 +336,37 @@ If Not rsInst.EOF Then
 	Do Until rsInst.EOF 
 		If rsInst("mco") = "Medicaid" Then
 			If rsInst("active") Then
-				allowMCO = allowMCO & "document.frmMain.radiomed[3].disabled = false; " & vbCrLf 
+				allowMCO = allowMCO & "ff.rdoMed_Med.disabled = false; " & vbCrLf 
 			Else
-				allowMCO = allowMCO & "document.frmMain.radiomed[3].disabled = true; " & vbCrLf 
+				allowMCO = allowMCO & "ff.rdoMed_Med.disabled = true; " & vbCrLf 
+			End If
+		End If
+		If rsInst("mco") = "AmeriHealth" Then
+			If rsInst("active") Then
+				allowMCO = allowMCO & "ff.rdoMed_Ame.disabled = false; " & vbCrLf 
+			Else
+				allowMCO = allowMCO & "ff.rdoMed_Ame.disabled = true; " & vbCrLf 
 			End If
 		End If
 		If rsInst("mco") = "Meridian" Then
 			If rsInst("active") Then
-				allowMCO = allowMCO & "document.frmMain.radiomed[0].disabled = false; " & vbCrLf 
+				allowMCO = allowMCO & "ff.rdoMed_Mer.disabled = false; " & vbCrLf 
 			Else
-				allowMCO = allowMCO & "document.frmMain.radiomed[0].disabled = true; " & vbCrLf 
+				allowMCO = allowMCO & "ff.rdoMed_Mer.disabled = true; " & vbCrLf 
 			End If
 		End If
 		If rsInst("mco") = "NHhealth" Then
 			If rsInst("active") Then
-				allowMCO = allowMCO & "document.frmMain.radiomed[1].disabled = false; " & vbCrLf 
+				allowMCO = allowMCO & "ff.rdoMed_NHH.disabled = false; " & vbCrLf 
 			Else
-				allowMCO = allowMCO & "document.frmMain.radiomed[1].disabled = true; " & vbCrLf 
+				allowMCO = allowMCO & "ff.rdoMed_NHH.disabled = true; " & vbCrLf 
 			End If
 		End If
 		If rsInst("mco") = "WellSense" Then
 			If rsInst("active") Then
-				allowMCO = allowMCO & "document.frmMain.radiomed[2].disabled = false; " & vbCrLf 
+				allowMCO = allowMCO & "ff.rdoMed_Wel.disabled = false; " & vbCrLf 
 			Else
-				allowMCO = allowMCO & "document.frmMain.radiomed[2].disabled = true; " & vbCrLf 
+				allowMCO = allowMCO & "ff.rdoMed_Wel.disabled = true; " & vbCrLf 
 			End If
 		End If
 		rsInst.MoveNext
@@ -542,669 +557,669 @@ End If
 		<link href='style.css' type='text/css' rel='stylesheet'>
 		<link href="CalendarControl.css" type="text/css" rel="stylesheet">
 		<script src="CalendarControl.js" language="javascript"></script>
-		<script language='JavaScript'>
-		<!--
-		function Left(str, n){
-			if (n <= 0)
-			    return "";
-			else if (n > String(str).length)
-			    return str;
-			else
-			    return String(str).substring(0,n);
+		<script language='JavaScript'><!--
+	function Left(str, n) {
+		if (n <= 0)
+		    return "";
+		else if (n > String(str).length)
+		    return str;
+		else
+		    return String(str).substring(0,n);
+	}
+	function RTrim(str) {
+        var whitespace = new String(" \t\n\r");
+        var s = new String(str);
+        if (whitespace.indexOf(s.charAt(s.length-1)) != -1) {
+            var i = s.length - 1;       
+            while (i >= 0 && whitespace.indexOf(s.charAt(i)) != -1) i--;
+            s = s.substring(0, i+1);
+        }
+        return s;
+    }
+
+    function LTrim(str) {
+		var whitespace = new String(" \t\n\r");
+		var s = new String(str);
+		if (whitespace.indexOf(s.charAt(0)) != -1) {
+			var j=0, i = s.length;
+			while (j < i && whitespace.indexOf(s.charAt(j)) != -1) j++;
+			s = s.substring(j, i);
 		}
-		function RTrim(str)
-    {
-            var whitespace = new String(" \t\n\r");
-
-            var s = new String(str);
-
-            if (whitespace.indexOf(s.charAt(s.length-1)) != -1) {
-               
-
-                var i = s.length - 1;       
-                while (i >= 0 && whitespace.indexOf(s.charAt(i)) != -1)
-                    i--;
-
-
-              
-                s = s.substring(0, i+1);
-            }
-
-            return s;
+		return s;
     }
-    function LTrim(str)
-    {
-            var whitespace = new String(" \t\n\r");
 
-            var s = new String(str);
-
-            if (whitespace.indexOf(s.charAt(0)) != -1) {
-                
-                var j=0, i = s.length;
-
-                while (j < i && whitespace.indexOf(s.charAt(j)) != -1)
-                    j++;
-
-                s = s.substring(j, i);
-            }
-
-            return s;
+    function Trim(str) {
+		return RTrim(LTrim(str));
     }
-    function Trim(str)
-    {
-            return RTrim(LTrim(str));
-    }
-		function maskMe(str,textbox,loc,delim)
-		{
-			var locs = loc.split(',');
-			for (var i = 0; i <= locs.length; i++)
-			{
-				for (var k = 0; k <= str.length; k++)
-				{
-					 if (k == locs[i])
-					 {
-						if (str.substring(k, k+1) != delim)
-					 	{
-					 		str = str.substring(0,k) + delim + str.substring(k,str.length);
-		     			}
-					}
-				}
-		 	}
-			textbox.value = str
-		}
-		function ReqChkMe(xxx)
-		{	
-			if (document.frmMain.saveme.value == 'Save') {
-				if (xxx == 2 || xxx == 3 || xxx == 4)
-				{
-					alert("ERROR: You cannot edit canceled/missed appointments.")
-					return;
-				}
-				<% If Session("type") <> 5 Then %>
-					if (document.frmMain.selDept.value == 0)
-					{
-						alert("ERROR: Please provide a department.")
-						return;
-					}
-				<% Else %>
-					if (document.frmMain.selDept.value == 0)
-					{
-						alert("ERROR: Please provide a court.")
-						return;
-					}
-				<% End If %>
-				<% If Session("type") = 3 Or Session("type") = 4 Or Session("type") = 5 Then %>
-					if (document.frmMain.txtreqname.value == "")
-					{
-						alert("ERROR: Please provide a Requester's Name.")
-						return;
-					}
-				<% End If %>
-				if (document.frmMain.txtClilname.value == "" || document.frmMain.txtClifname.value == "")
-				{
-					alert("ERROR: Please provide client.")
-					return;
-				}
-				if ((document.frmMain.chkcall.checked == true || document.frmMain.chkleave.checked == true) && document.frmMain.txtCliFon.value == "") {
-					alert("Please input client's phone number.");
-					return;
-				}
-				<% If Session("type") = 5 Then %>
-					if (document.frmMain.txtClinName.value == "") {
-						alert("ERROR: Please provide Docket Number.")
-						return;
-					}
-					if (document.frmMain.txtPDamount.value == "") {
-						alert("ERROR: Please provide Amount requested from court.")
-						return;
-					}
-					if (document.frmMain.txtemail.value == "") {
-						alert("ERROR: Please provide email.")
-						return;
-					}
-					//alert(document.frmMain.F1.value);
-				<% End If %>
-				<% If Session("myClass") = 4 Or Session("myClass") = 6 Then %>
-					if (document.frmMain.mrrec.value == "") {
-						alert("ERROR: Please provide Patient MR#.")
-						return;
-					}
-				<% End If %>
-				<% If Request("ID") = "" Then %>
-					if (document.frmMain.radioLang[0].checked == true)
-					{
-				<% End If %>	
-				<% If Session("UID") <> 36 Then %> 
-					if 	(document.frmMain.selLang.value == 0)
-					{
-						alert("ERROR: Please provide language.")
-						return;
-					}
-					<% End If %>
-				<% If Request("ID") = "" Then %>
-					}
-				<% End If %>
-				<% If Request("ID") = "" Then %>
-					<% If Session("InstID") = 108 Then %>
-						<% If Session("UID") <> 36 Then %> 
-							//if (document.frmMain.radioLang[5].checked == true && document.frmMain.txtoLang.value == "")
-							//{
-							//		alert("ERROR: Please provide language.")
-							//		return;
-							//}
-						<% End If %>
-					<% End If %>
-				<% Else %>
-					<% If Session("UID") <> 36 Then %> 
-						if 	(document.frmMain.selLang.value == 98 && document.frmMain.txtoLang.value == "")
-						{
-							alert("ERROR: Please provide language.")
-							return;
-						}
-					<% End If %>
-				<% End If %>
-				if 	(document.frmMain.txtAppDate.value == "")
-				{
-					alert("ERROR: Please provide appointment date.")
-					return;
-				}
-				if (Trim(document.frmMain.txtCliAdd.value) != "" || Trim(document.frmMain.txtCliCity.value) != "" || Trim(document.frmMain.txtCliState.value) != "" || Trim(document.frmMain.txtCliZip.value) != "") {
-					if (document.frmMain.chkClientAdd.checked == false) {
-						alert("Alternate Appointment Address detected. If you wish to make this address as the appointment address, please check the checkbox beside it. \nTHE INTERPRETER WILL BE SENT TO THIS ADDRESS.")
-						return;
-					}
-				}
-				if 	(document.frmMain.chkClientAdd.checked == true)
-				{
-					if (Trim(document.frmMain.txtCliAdd.value) == "" || Trim(document.frmMain.txtCliCity.value) == "" || Trim(document.frmMain.txtCliState.value) == "" || Trim(document.frmMain.txtCliZip.value) == "")
-					{
-						alert("ERROR: Please provide Alternate Appointment's Full Address.")
-						return;
-					}
-				}
-				<% If Session("InstID") = 108 Then %>
-				if (document.frmMain.txtdhhsFon.value == "")
-				{
-					alert("ERROR: Please provide assigned DHHS staff email.")
-					return;
-				}
-				<% End If %>
-				if 	(Trim(document.frmMain.txtAppTFrom.value) == "" || Trim(document.frmMain.txtAppTTo.value) == "")
-				{
-					alert("ERROR: Please provide appointment time.")
-					return;
-				}
-				if (document.frmMain.txtAppTFrom.value == "24:00")
-				{
-					alert("ERROR: Appointment Time (From:) is invalid (24:00 not accepted)."); 
-					return;
-				}
-				if (document.frmMain.txtAppTTo.value == "24:00")
-				{
-					alert("ERROR: Appointment Time (To:) is invalid (24:00 not accepted)."); 
-					return;
-				}
-				var d1 = new Date(document.frmMain.txtAppDate.value + " " + document.frmMain.txtAppTFrom.value);
-				var d2 = new Date(document.frmMain.txtAppDate.value + " " + document.frmMain.txtAppTTo.value);
-				var stime = d1.getHours();
-				var etime = d2.getHours() ;
-				var difference = etime - stime;
-				if 	(difference < 0)
-				{
-					alert("ERROR: Invalid time frame.")
-					return;
-				}
-				
-				if (document.frmMain.h_drg.value == "True") {
-					if (document.frmMain.chkmed.checked == true) {
-						if (document.frmMain.txtDOB.value == "") {
-							alert("Please input client's date of birth.")
-							return;
-						}
-						if (document.frmMain.radiomed[0].checked == false && document.frmMain.radiomed[1].checked == false && document.frmMain.radiomed[2].checked == false &&
-							document.frmMain.radiomed[3].checked == false) {
-							alert("Please select a Medicaid/MCO.")
-							return;
-						}
-						if (Trim(document.frmMain.MHPnum.value) == "" && document.frmMain.radiomed[0].checked == true) {
-							alert("Please input client's Meridian Health Plan number.")
-							return;
-						}
-						if (Trim(document.frmMain.NHHFnum.value) == "" && document.frmMain.radiomed[1].checked == true) {
-							alert("Please input client's NH Healthy Families number.")
-							return;
-						}
-						else {
-							if (Trim(document.frmMain.NHHFnum.value) != "") {
-								var chrmed = Trim(document.frmMain.NHHFnum.value);
-								if (chrmed.length != 11) {
-									alert("Invalid NH Healthy Families number length(11).")
-									return;
-								}
-							}
-						}
-						if (Trim(document.frmMain.WSHPnum.value) == "" && document.frmMain.radiomed[2].checked == true) {
-							alert("Please input client's Well Sense Health Plan number.")
-							return;
-						}
-						else {
-							if (Trim(document.frmMain.WSHPnum.value) != "") {
-								var chrmed = Trim(document.frmMain.WSHPnum.value);
-								if (chrmed.length != 9) {
-									alert("Invalid Well Sense Health Plans number length(9).")
-									return;
-								}
-								var str = Left(document.frmMain.WSHPnum.value, 2)
-								var res = str.toUpperCase(); 
-								if (res != 'NH') {
-									alert("Well Sense number MUST contain NH (eg: NHXXXXXXX).")
-									return;
-								}
-							}
-						}
-						if (Trim(document.frmMain.MCnum.value) == "" && document.frmMain.radiomed[3].checked == true) {
-							alert("Please input client's Medicaid number.")
-							return;
-						}
-						else {
-							if (Trim(document.frmMain.MCnum.value) != "") {
-								var chrmed = Trim(document.frmMain.MCnum.value);
-								if (chrmed.length != 11) {
-									alert("Invalid Medicaid number length(11).")
-									return;
-								}
-							}
-						}
-						if (document.frmMain.chkawk.checked == false) {
-							alert("Acknowledge statement is required.")
-							return;
-						}
-					} 
-					if ((Trim(document.frmMain.MCnum.value) == "" && document.frmMain.radiomed[3].checked == true) || (Trim(document.frmMain.MHPnum.value) == "" && document.frmMain.radiomed[0].checked == true) || 
-							(Trim(document.frmMain.NHHFnum.value) == "" && document.frmMain.radiomed[1].checked == true) || (Trim(document.frmMain.WSHPnum.value) == "" && document.frmMain.radiomed[2].checked == true) ){
-						var ans = window.confirm("This institution/department is qualified for Medicaid/MCO.\nPlease make sure to fill up all necessary information to bill Medicaid/MCO.\nOtherwise, this appointment will be billed to this institution.\nCancel to enter Medicaid/MCO info.\nOK to continue saving.");
-						if (ans)
-						{
-							document.frmMain.saveme.value = 'Please Wait...';
-							<% If Request("ID") = "" Then%>
-								document.frmMain.action = 'action.asp?ctrl=1';
-							<% Else %>
-								document.frmMain.action = 'action.asp?ctrl=3&ID=' + <%=Request("ID")%>;
-							<% End If %>
-							document.frmMain.submit();
-						}
-						else {
-							document.frmMain.saveme.value = 'Save';
-						}
-					}
-					else {
-						var ans = window.confirm("Save Request? Click Cancel to stop.");
-						if (ans) {
-							document.frmMain.saveme.value = 'Please Wait...';
-							<% If Request("ID") = "" Then%>
-								document.frmMain.action = 'action.asp?ctrl=1';
-							<% Else %>
-								document.frmMain.action = 'action.asp?ctrl=3&ID=' + <%=Request("ID")%>;
-							<% End If %>
-							document.frmMain.submit();
-						} else {
-							document.frmMain.saveme.value = 'Save';
-						}
-					}
-				}
-				else {
-					var ans = window.confirm("Save Request? Click Cancel to stop.");
-					if (ans)
-					{
-						document.frmMain.saveme.value = 'Please Wait...';
-						<% If Request("ID") = "" Then%>
-							document.frmMain.action = 'action.asp?ctrl=1';
-						<% Else %>
-							document.frmMain.action = 'action.asp?ctrl=3&ID=' + <%=Request("ID")%>;
-						<% End If %>
-						document.frmMain.submit();
-					}
-					else {
-						document.frmMain.saveme.value = 'Save';
+
+	function maskMe(str,textbox,loc,delim) {
+		var locs = loc.split(',');
+		for (var i = 0; i <= locs.length; i++) {
+			for (var k = 0; k <= str.length; k++) {
+				if (k == locs[i]) {
+					if (str.substring(k, k+1) != delim) {
+						str = str.substring(0,k) + delim + str.substring(k,str.length);
 					}
 				}
 			}
 		}
-		function bawal(tmpform)
-		{
-			var iChars = ",|\"\'";
-			var tmp = "";
-			for (var i = 0; i < tmpform.value.length; i++)
-			 {
-			  	if (iChars.indexOf(tmpform.value.charAt(i)) != -1)
-			  	{
-			  		alert ("This character is not allowed.");
-			  		tmpform.value = tmp;
-			  		return;
-		  		}
-			  	else
-		  		{
-		  			tmp = tmp + tmpform.value.charAt(i);
-		  		}
+		textbox.value = str;
+	}
+
+	function ReqChkMe(xxx) {
+		if (document.frmMain.saveme.value == 'Save') {
+			if (xxx == 2 || xxx == 3 || xxx == 4) {
+				alert("ERROR: You cannot edit canceled/missed appointments.")
+				return;
+			}
+<% If Session("type") <> 5 Then %>
+			if (document.frmMain.selDept.value == 0) {
+				alert("ERROR: Please provide a department.")
+				return;
+			}
+<% Else %>
+			if (document.frmMain.selDept.value == 0) {
+				alert("ERROR: Please provide a court.")
+				return;
+			}
+<% End If %>
+<% If Session("type") = 3 Or Session("type") = 4 Or Session("type") = 5 Then %>
+			if (document.frmMain.txtreqname.value == "") {
+				alert("ERROR: Please provide a Requester's Name.")
+				return;
+			}
+<% End If %>
+			if (document.frmMain.txtClilname.value == "" || document.frmMain.txtClifname.value == "") {
+				alert("ERROR: Please provide client.")
+				return;
+			}
+			if ((document.frmMain.chkcall.checked == true || document.frmMain.chkleave.checked == true) && document.frmMain.txtCliFon.value == "") {
+				alert("Please input client's phone number.");
+				return;
+			}
+<% If Session("type") = 5 Then %>
+			if (document.frmMain.txtClinName.value == "") {
+				alert("ERROR: Please provide Docket Number.")
+				return;
+			}
+			if (document.frmMain.txtPDamount.value == "") {
+				alert("ERROR: Please provide Amount requested from court.")
+				return;
+			}
+			if (document.frmMain.txtemail.value == "") {
+				alert("ERROR: Please provide email.")
+				return;
+			}
+			//alert(document.frmMain.F1.value);
+<% End If %>
+<% If Session("myClass") = 4 Or Session("myClass") = 6 Then %>
+			if (document.frmMain.mrrec.value == "") {
+				alert("ERROR: Please provide Patient MR#.")
+				return;
+			}
+<% End If %>
+<% If Request("ID") = "" Then %>
+			if (document.frmMain.radioLang[0].checked == true) {
+<% End If %>	
+<% If Session("UID") <> 36 Then %> 
+				if 	(document.frmMain.selLang.value == 0) {
+					alert("ERROR: Please provide language.")
+					return;
+				}
+<% End If %>
+<% If Request("ID") = "" Then %>
+			}
+<% End If %>
+<% If Request("ID") = "" Then %>
+	<% If Session("InstID") = 108 Then %>
+		<% If Session("UID") <> 36 Then %> 
+			//if (document.frmMain.radioLang[5].checked == true && document.frmMain.txtoLang.value == "")
+			//{
+			//		alert("ERROR: Please provide language.")
+			//		return;
+			//}
+		<% End If %>
+	<% End If %>
+<% Else %>
+	<% If Session("UID") <> 36 Then %> 
+			if 	(document.frmMain.selLang.value == 98 && document.frmMain.txtoLang.value == "") {
+				alert("ERROR: Please provide language.")
+				return;
+			}
+	<% End If %>
+<% End If %>
+			if 	(document.frmMain.txtAppDate.value == "") {
+				alert("ERROR: Please provide appointment date.")
+				return;
+			}
+			if (Trim(document.frmMain.txtCliAdd.value) != "" ||
+					Trim(document.frmMain.txtCliCity.value) != "" ||
+					Trim(document.frmMain.txtCliState.value) != "" ||
+					Trim(document.frmMain.txtCliZip.value) != ""
+					) {
+				if (document.frmMain.chkClientAdd.checked == false) {
+					alert("Alternate Appointment Address detected. If you wish to make this address as the" +
+							"appointment address, please check the checkbox beside it. \nTHE INTERPRETER " +
+							"WILL BE SENT TO THIS ADDRESS.");
+					return;
+				}
+			}
+			if 	(document.frmMain.chkClientAdd.checked == true) {
+				if (Trim(document.frmMain.txtCliAdd.value) == "" ||
+						Trim(document.frmMain.txtCliCity.value) == "" ||
+						Trim(document.frmMain.txtCliState.value) == "" ||
+						Trim(document.frmMain.txtCliZip.value) == ""
+						) {
+					alert("ERROR: Please provide Alternate Appointment's Full Address.")
+					return;
+				}
+			}
+<% If Session("InstID") = 108 Then %>
+			if (document.frmMain.txtdhhsFon.value == "") {
+				alert("ERROR: Please provide assigned DHHS staff email.")
+				return;
+			}
+<% End If %>
+			if 	(Trim(document.frmMain.txtAppTFrom.value) == "" || Trim(document.frmMain.txtAppTTo.value) == "") {
+				alert("ERROR: Please provide appointment time.")
+				return;
+			}
+			if (document.frmMain.txtAppTFrom.value == "24:00") {
+				alert("ERROR: Appointment Time (From:) is invalid (24:00 not accepted)."); 
+				return;
+			}
+			if (document.frmMain.txtAppTTo.value == "24:00") {
+				alert("ERROR: Appointment Time (To:) is invalid (24:00 not accepted)."); 
+				return;
+			}
+			var d1 = new Date(document.frmMain.txtAppDate.value + " " + document.frmMain.txtAppTFrom.value);
+			var d2 = new Date(document.frmMain.txtAppDate.value + " " + document.frmMain.txtAppTTo.value);
+			var stime = d1.getHours();
+			var etime = d2.getHours() ;
+			var difference = etime - stime;
+			if 	(difference < 0) {
+				alert("ERROR: Invalid time frame.")
+				return;
+			}
+				
+			if (document.frmMain.h_drg.value == "True") {
+				if (document.frmMain.chkmed.checked == true) {
+					if (document.frmMain.txtDOB.value == "") {
+						alert("Please input client's date of birth.")
+						return;
+					}
+					if (document.frmMain.rdoMed_Ame.checked == false &&
+							document.frmMain.rdoMed_Med.checked == false &&
+							document.frmMain.rdoMed_Mer.checked == false &&
+							document.frmMain.rdoMed_NHH.checked == false &&
+							document.frmMain.rdoMed_Wel.checked == false ) {
+						alert("Please select a Medicaid/MCO.")
+						return;
+					}
+					if (Trim(document.frmMain.MHPnum.value) == "" &&
+							document.frmMain.rdoMed_Mer.checked == true) {
+						alert("Please input client's Meridian Health Plan number.")
+						return;
+					}
+					if (Trim(document.frmMain.NHHFnum.value) == "" && document.frmMain.rdoMed_NHH.checked == true) {
+						alert("Please input client's NH Healthy Families number.")
+						return;
+					} else {
+						if (Trim(document.frmMain.NHHFnum.value) != "") {
+							var chrmed = Trim(document.frmMain.NHHFnum.value);
+							if (chrmed.length != 11) {
+								alert("Invalid NH Healthy Families number length(11).")
+								return;
+							}
+						}
+					}
+					if (Trim(document.frmMain.AHMIdNum.value) == "" && document.frmMain.rdoMed_Ame.checked == true) {
+						alert("Please input client's AmeriHealth Member ID number.")
+						return;
+					} else {
+						if (Trim(document.frmMain.AHMIdNum.value) != "") {
+							var chrmed = Trim(document.frmMain.AHMIdNum.value);
+							if (chrmed.length != 9) {
+								alert("Invalid AmeriHealth Member ID number length(9).")
+								return;
+							}
+						}
+					}
+					if (Trim(document.frmMain.WSHPnum.value) == "" && document.frmMain.rdoMed_Wel.checked == true) {
+						alert("Please input client's Well Sense Health Plan number.")
+						return;
+					} else {
+						if (Trim(document.frmMain.WSHPnum.value) != "") {
+							var chrmed = Trim(document.frmMain.WSHPnum.value);
+							if (chrmed.length != 9) {
+								alert("Invalid Well Sense Health Plans number length(9).")
+								return;
+							}
+							var str = Left(document.frmMain.WSHPnum.value, 2)
+							var res = str.toUpperCase(); 
+							if (res != 'NH') {
+								alert("Well Sense number MUST contain NH (eg: NHXXXXXXX).")
+								return;
+							}
+						}
+					}
+					if (Trim(document.frmMain.MCnum.value) == "" && document.frmMain.rdoMed_Med.checked == true) {
+						alert("Please input client's Medicaid number.")
+						return;
+					} else {
+						if (Trim(document.frmMain.MCnum.value) != "") {
+							var chrmed = Trim(document.frmMain.MCnum.value);
+							if (chrmed.length != 11) {
+								alert("Invalid Medicaid number length(11).")
+								return;
+							}
+						}
+					}
+					if (document.frmMain.chkawk.checked == false) {
+						alert("Acknowledge statement is required.")
+						return;
+					}
+				} 
+				if (	(
+							Trim(document.frmMain.MCnum.value) == "" &&
+							document.frmMain.rdoMed_Med.checked == true
+						) || (
+							Trim(document.frmMain.AHMIdNum.value) == "" &&
+							document.frmMain.rdoMed_Ame.checked == true
+						) || (
+							Trim(document.frmMain.MHPnum.value) == "" &&
+							document.frmMain.rdoMed_Mer.checked == true
+						) || (
+							Trim(document.frmMain.NHHFnum.value) == "" &&
+							document.frmMain.rdoMed_NHH.checked == true
+						) || (
+							Trim(document.frmMain.WSHPnum.value) == "" &&
+							document.frmMain.rdoMed_Wel.checked == true
+						) ){
+					var ans = window.confirm("This institution/department is qualified for Medicaid/MCO.\n" + 
+							"Please make sure to fill up all necessary information to bill Medicaid/MCO.\n" +
+							"Otherwise, this appointment will be billed to this institution.\nCancel to "+
+							"enter Medicaid/MCO info.\nOK to continue saving.");
+					if (ans) {
+						document.frmMain.saveme.value = 'Please Wait...';
+<% If Request("ID") = "" Then%>
+						document.frmMain.action = 'action.asp?ctrl=1';
+<% Else %>
+						document.frmMain.action = 'action.asp?ctrl=3&ID=' + <%=Request("ID")%>;
+<% End If %>
+						document.frmMain.submit();
+					} else {
+						document.frmMain.saveme.value = 'Save';
+					}
+				} else {
+					var ans = window.confirm("Save Request? Click Cancel to stop.");
+					if (ans) {
+						document.frmMain.saveme.value = 'Please Wait...';
+<% If Request("ID") = "" Then%>
+						document.frmMain.action = 'action.asp?ctrl=1';
+<% Else %>
+						document.frmMain.action = 'action.asp?ctrl=3&ID=' + <%=Request("ID")%>;
+<% End If %>
+						document.frmMain.submit();
+					} else {
+						document.frmMain.saveme.value = 'Save';
+					}
+				}
+			} else {
+				var ans = window.confirm("Save Request? Click Cancel to stop.");
+				if (ans) {
+					document.frmMain.saveme.value = 'Please Wait...';
+<% If Request("ID") = "" Then%>
+					document.frmMain.action = 'action.asp?ctrl=1';
+<% Else %>
+					document.frmMain.action = 'action.asp?ctrl=3&ID=' + <%=Request("ID")%>;
+<% End If %>
+					document.frmMain.submit();
+				} else {
+					document.frmMain.saveme.value = 'Save';
+				}
+			}
+		}
+	}
+
+	function bawal(tmpform) {
+		var iChars = ",|\"\'";
+		var tmp = "";
+		for (var i = 0; i < tmpform.value.length; i++) {
+			if (iChars.indexOf(tmpform.value.charAt(i)) != -1) {
+				alert ("This character is not allowed.");
+			  	tmpform.value = tmp;
+			  	return;
+		  	} else {
+		  		tmp = tmp + tmpform.value.charAt(i);
 		  	}
 		}
-		function bawal2(tmpform)
-		{
-			var iChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz0123456789-,.\'"; //",|\"\'";
-			var tmp = "";
-			for (var i = 0; i < tmpform.value.length; i++)
-			 {
-			  	if (iChars.indexOf(tmpform.value.charAt(i)) != -1)
-			  	{
-			  		tmp = tmp + tmpform.value.charAt(i);
-		  		}
-			  	else
-		  		{
-		  			alert ("This character is not allowed.");
-			  		tmpform.value = tmp;
-			  		return;
-		  			
-		  		}
+	}
+
+	function bawal2(tmpform) {
+		var iChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz0123456789-,.\'"; //",|\"\'";
+		var tmp = "";
+		for (var i = 0; i < tmpform.value.length; i++) {
+			if (iChars.indexOf(tmpform.value.charAt(i)) != -1) {
+			  	tmp = tmp + tmpform.value.charAt(i);
+		  	} else {
+		  		alert ("This character is not allowed.");
+			  	tmpform.value = tmp;
+			  	return;	
 		  	}
 		}
-		function bawalletters(tmpform) {
-			var iChars = "0123456789";
-			var tmp = "";
-			for (var i = 0; i < tmpform.value.length; i++)
-			 {
-			  	if (iChars.indexOf(tmpform.value.charAt(i)) != -1)
-			  	{
-			  		tmp = tmp + tmpform.value.charAt(i);
-		  		}
-			  	else
-		  		{
-		  			alert ("This character is not allowed.");
-			  		tmpform.value = tmp;
-			  		return;
-		  			
-		  		}
+	}
+
+	function bawalletters(tmpform) {
+		var iChars = "0123456789";
+		var tmp = "";
+		for (var i = 0; i < tmpform.value.length; i++) {
+			if (iChars.indexOf(tmpform.value.charAt(i)) != -1) {
+				tmp = tmp + tmpform.value.charAt(i);
+			} else {
+				alert ("This character is not allowed.");
+			  	tmpform.value = tmp;
+			  	return;	
 		  	}
 		}
-		function DeptInfo(dept)
-		{
-			if (dept == 0 )
-			{
+	}
+
+	function DeptInfo(dept) {
+		if (dept == 0 ) {
 			document.frmMain.selDept.value =0;
 			document.frmMain.txtInstAddr.value = "";
 			document.frmMain.txtBlname.value = "";
 			document.frmMain.txtBilAddr.value = "";
 			document.frmMain.h_drg.value = "False";
-			}
-			<%=strDept2%>
 		}
-		<% If Request("ID") = "" Then %>
-			function chkLang()
-			{
-				if (document.frmMain.radioLang[0].checked == false)
-				{
-					document.frmMain.selLang.value = 0;
-					document.frmMain.selLang.disabled = true;
-				}
-				else
-				{
-					document.frmMain.selLang.disabled = false;
-				}
-				//if (document.frmMain.radioLang[5].checked == false)
-				//{
-				//	document.frmMain.txtoLang.value = "";
-				//	document.frmMain.txtoLang.disabled = true;
-				//}
-				//else
-				//{
-					//document.frmMain.txtoLang.value = "";
-				//	document.frmMain.txtoLang.disabled = false;
-				//}
-			}
-		<% End If %>
-		function IsMinor()
-		{
-			if (document.frmMain.chkminor.checked == false)
-			{
-				document.frmMain.txtParents.disabled = true;
-				document.frmMain.txtParents.value = "";
-			}
-			else
-			{
-				document.frmMain.txtParents.disabled = false;
-			}
+		<%=strDept2%>
+	}
+
+<% If Request("ID") = "" Then %>
+	function chkLang() {
+		if (document.frmMain.radioLang[0].checked == false) {
+			document.frmMain.selLang.value = 0;
+			document.frmMain.selLang.disabled = true;
+		} else {
+			document.frmMain.selLang.disabled = false;
 		}
-		function ReasList(dept)
-		{
-			if (document.frmMain.selReas != null) {
-				document.frmMain.selReas.length = 0;
-				<%=strDept3%>
-			}
+		//if (document.frmMain.radioLang[5].checked == false) {
+		//	document.frmMain.txtoLang.value = "";
+		//	document.frmMain.txtoLang.disabled = true;
+		// } else {
+		//  document.frmMain.txtoLang.value = "";
+		//	document.frmMain.txtoLang.disabled = false;
+		//}
+	}
+<% End If %>
+	function IsMinor() {
+		if (document.frmMain.chkminor.checked == false) {
+			document.frmMain.txtParents.disabled = true;
+			document.frmMain.txtParents.value = "";
+		} else {
+			document.frmMain.txtParents.disabled = false;
 		}
-		function MyReas()
-		{
+	}
 	
+	function ReasList(dept) {
+		if (document.frmMain.selReas != null) {
+			document.frmMain.selReas.length = 0;
+			<%=strDept3%>
 		}
-		<% If Session("UID") <> 36 Then %> 
-			function oLang(xxx)
-			{
-			//	if (xxx == 98)
-			//	{
-			//		document.frmMain.txtoLang.disabled = false;
-			//	}
-			//	else
-			//	{
-			//		document.frmMain.txtoLang.value = "";
-			//		document.frmMain.txtoLang.disabled = true;
-			//	}
+	}
+	
+	function MyReas() {
+	}
+
+<% If Session("UID") <> 36 Then %> 
+	function oLang(xxx) {
+		//	if (xxx == 98) {
+		//		document.frmMain.txtoLang.disabled = false;
+		//	} else {
+		//		document.frmMain.txtoLang.value = "";
+		//		document.frmMain.txtoLang.disabled = true;
+		//	}
+	}
+<% End If %>
+	function uploadFile() {
+		var tmpfname = "<%=tmpFilename%>";
+		newwindow = window.open('upload.asp?hfname=' + tmpfname ,'name','height=150,width=400,scrollbars=1,directories=0,status=1,toolbar=0,resizable=0');
+		if (window.focus) {newwindow.focus()}
+	}
+<% If Session("myClass") <> 3 Then %>
+	function DpwedeMed() {
+		if (document.frmMain.chkacc.checked == true || document.frmMain.chkcomp.checked == true) {
+			alert("This appointment is not eligible for Medicaid/MCO.");
+			document.frmMain.chkout.checked = false;
+			return;
+		}
+	}
+
+	function DpwedeIba() {
+		if (document.frmMain.chkout.checked == true) {
+			if (document.frmMain.chkacc.checked == true || document.frmMain.chkcomp.checked == true) {
+				alert("This appointment is not eligible for Auto Accident and/or Worker's compensation.");
+				document.frmMain.chkacc.checked = false;
+				document.frmMain.chkcomp.checked = false;
+				return;
 			}
-		<% End If %>
-		function uploadFile()
-		{
-			var tmpfname = "<%=tmpFilename%>";
-			newwindow = window.open('upload.asp?hfname=' + tmpfname ,'name','height=150,width=400,scrollbars=1,directories=0,status=1,toolbar=0,resizable=0');
-				if (window.focus) {newwindow.focus()}
 		}
-		<% If Session("myClass") <> 3 Then %>
-			function DpwedeMed() {
-				if (document.frmMain.chkacc.checked == true || document.frmMain.chkcomp.checked == true) {
-					alert("This appointment is not eligible for Medicaid/MCO.");
-					document.frmMain.chkout.checked = false;
+	}
+
+	function disableMCOFields(ff) {
+		ff.AHMIdNum.disabled 	= true;
+		ff.MHPnum.disabled 		= true;
+		ff.NHHFnum.disabled 	= true;
+		ff.WSHPnum.disabled 	= true;
+		ff.MCnum.disabled 		= true;
+	}
+
+	function resetMCOTexts(ff) {
+		ff.AHMIdNum.value 		= "";
+		ff.MHPnum.value 		= "";
+		ff.NHHFnum.value 		= "";
+		ff.WSHPnum.value 		= "";
+		ff.MCnum.value 			= "";
+	}
+
+	function resetMCOFields() {
+		var ff = document.frmMain;
+
+		ff.rdoMed_Ame.disabled 	= true;
+		ff.rdoMed_Med.disabled 	= true;
+		ff.rdoMed_Mer.disabled 	= true;
+		ff.rdoMed_NHH.disabled 	= true;
+		ff.rdoMed_Wel.disabled 	= true;
+		
+		ff.rdoMed_Ame.checked 	= false;
+		ff.rdoMed_Med.checked 	= false;
+		ff.rdoMed_Mer.checked 	= false;
+		ff.rdoMed_NHH.checked 	= false;
+		ff.rdoMed_Wel.checked 	= false;
+		
+		ff.chkawk.disabled 		= true;
+		
+		resetMCOTexts(ff);
+		disableMCOFields(ff);
+	}
+
+	function OutPatient() {
+		var ff = document.frmMain;
+		if (ff.chkout.checked == true) {
+			ff.chkmed.disabled = false;
+		} else {
+			ff.chkmed.checked = false;
+			ff.chkmed.disabled = true;
+			resetMCOFields();
+		}
+	}
+
+	function HasMedicaid(dept) {
+		var ff = document.frmMain;
+		if (ff.chkmed.checked == true) {
+			<%=allowMCO%>
+			ff.chkawk.disabled = false;
+		} else {
+			resetMCOFields();
+		}
+	}
+	
+// TODO: change this ~~!
+	function SelPlan() {
+		var ff = document.frmMain;
+		disableMCOFields(ff);
+		if (ff.rdoMed_Ame.checked == true) {
+			ff.AHMIdNum.disabled 	= false;
+			ff.MHPnum.value 		= "";
+			ff.NHHFnum.value 		= "";
+			ff.WSHPnum.value 		= "";
+			ff.MCnum.disabled 		= false;
+		}
+		if (ff.rdoMed_Mer.checked == true) {
+			ff.MHPnum.disabled 		= false;
+			ff.AHMIdNum.value 		= "";
+			ff.NHHFnum.value 		= "";
+			ff.WSHPnum.value 		= "";
+			ff.MCnum.disabled 		= false;
+		}
+		if (ff.rdoMed_NHH.checked == true) {
+			ff.NHHFnum.disabled 	= false;
+			ff.AHMIdNum.value 		= "";
+			ff.MHPnum.value 		= "";
+			ff.WSHPnum.value 		= "";
+			ff.MCnum.disabled 		= false;
+		}
+		if (ff.rdoMed_Wel.checked == true) {
+			ff.WSHPnum.disabled 	= false;
+			ff.AHMIdNum.value 		= "";
+			ff.NHHFnum.value 		= "";
+			ff.MHPnum.value 		= "";
+			ff.MCnum.disabled 		= false;
+		}
+		if (ff.rdoMed_Med.checked == true) {
+			ff.MCnum.disabled 		= false;
+			ff.AHMIdNum.value 		= "";
+			ff.NHHFnum.value 		= "";
+			ff.WSHPnum.value 		= "";
+			ff.MHPnum.value 		= "";
+		}
+	}
+
+// TODO: change this ~~!
+	function Chkdrg(tmpdept) {
+		if (document.frmMain.h_drg.value == "False") {
+			// document.frmMain.chkmed.checked = false;
+			document.frmMain.MCnum.value = "";
+			//document.frmMain.chkmed.disabled = true;
+			document.frmMain.MCnum.disabled = true;
+			document.frmMain.chkacc.disabled = true;
+			document.frmMain.chkcomp.disabled = true;
+			// document.frmMain.selIns.disabled = true;
+			document.frmMain.chkacc.checked = false;
+			document.frmMain.chkcomp.checked = false;
+			document.frmMain.btnSec.disabled = true;
+			document.frmMain.selIns.value = "";
+			document.frmMain.chkout.checked = false;
+			document.frmMain.chkout.disabled = true;
+		} else {
+			document.frmMain.chkout.disabled = false;
+			document.frmMain.chkmed.disabled = false;
+			// document.frmMain.MCnum.disabled = false;
+			document.frmMain.chkacc.disabled = false;
+			document.frmMain.chkcomp.disabled = false;
+			// document.frmMain.selIns.disabled = false;
+			document.frmMain.btnSec.disabled = false;
+			OutPatient();
+			HasMedicaid(tmpdept);
+		}
+	}
+
+	function SaveMed(xxx) {
+		var ff = document.frmMain;
+		if (ff.h_drg.value == "True") {
+			if (ff.chkmed.checked == true) {
+				if (ff.txtDOB.value == "") {
+					alert("Please input client's date of birth.")
 					return;
 				}
-			}
-			function DpwedeIba() {
-				if (document.frmMain.chkout.checked == true) {
-					if (document.frmMain.chkacc.checked == true || document.frmMain.chkcomp.checked == true) {
-						alert("This appointment is not eligible for Auto Accident and/or Worker's compensation.");
-						document.frmMain.chkacc.checked = false;
-						document.frmMain.chkcomp.checked = false;
-						return;
+				if (ff.rdoMed_Ame.checked == false &&
+						ff.rdoMed_Med.checked == false &&
+						ff.rdoMed_Mer.checked == false &&
+						ff.rdoMed_NHH.checked == false &&
+						ff.rdoMed_Wel.checked == false
+						) {
+					alert("Please select a Medicaid/MCO.")
+					return;
+				}
+				if (	Trim(ff.AHMIdNum.value) == "" &&
+						ff.rdoMed_Ame.checked == true
+						) {
+					alert("Please input client's AmeriHealth Member ID number.")
+					return;
+				} else {
+					if (Trim(ff.AHMIdNum.value) != "") {
+						var chrmed = Trim(ff.AHMIdNum.value);
+						if (chrmed.length != 9) {
+							alert("Invalid AmeriHealth Member ID number length.")
+							return;
+						}
 					}
 				}
-			}
-			function OutPatient() {
-				if (document.frmMain.chkout.checked == true) {
-					document.frmMain.chkmed.disabled = false;
-				}
-				else {
-					document.frmMain.chkmed.checked = false;
-					document.frmMain.chkmed.disabled = true;
-					document.frmMain.radiomed[3].disabled = true;
-					document.frmMain.radiomed[2].disabled = true;
-					document.frmMain.radiomed[1].disabled = true;
-					document.frmMain.radiomed[0].disabled = true;
-					document.frmMain.radiomed[3].checked = false;
-					document.frmMain.radiomed[2].checked = false;
-					document.frmMain.radiomed[1].checked = false;
-					document.frmMain.radiomed[0].checked = false;
-					document.frmMain.MHPnum.value = "";
-					document.frmMain.NHHFnum.value = "";
-					document.frmMain.WSHPnum.value = "";
-					document.frmMain.MCnum.value = "";
-					document.frmMain.chkawk.disabled = true;
-					document.frmMain.MHPnum.disabled = true;
-					document.frmMain.NHHFnum.disabled = true;
-					document.frmMain.WSHPnum.disabled = true;
-					document.frmMain.MCnum.disabled = true;
-				}
-			}
-			function HasMedicaid(dept) {
-				
-				if (document.frmMain.chkmed.checked == true) {
-					<%=allowMCO%>
-					//document.frmMain.radiomed[3].disabled = false;
-					//document.frmMain.radiomed[2].disabled = false;
-					//document.frmMain.radiomed[1].disabled = false;
-					//document.frmMain.radiomed[0].disabled = false;
-					//document.frmAssign.MCnum.disabled = false;
-					document.frmMain.chkawk.disabled = false;
-				}
-				else {
-					document.frmMain.radiomed[3].disabled = true;
-					document.frmMain.radiomed[2].disabled = true;
-					document.frmMain.radiomed[1].disabled = true;
-					document.frmMain.radiomed[0].disabled = true;
-					document.frmMain.radiomed[3].checked = false;
-					document.frmMain.radiomed[2].checked = false;
-					document.frmMain.radiomed[1].checked = false;
-					document.frmMain.radiomed[0].checked = false;
-					document.frmMain.MHPnum.value = "";
-					document.frmMain.NHHFnum.value = "";
-					document.frmMain.WSHPnum.value = "";
-					document.frmMain.MCnum.value = "";
-					document.frmMain.chkawk.disabled = true;
-					document.frmMain.MHPnum.disabled = true;
-					document.frmMain.NHHFnum.disabled = true;
-					document.frmMain.WSHPnum.disabled = true;
-					document.frmMain.MCnum.disabled = true;
-				}
-			}
-			function SelPlan() {
-				document.frmMain.MHPnum.disabled = true;
-				document.frmMain.NHHFnum.disabled = true;
-				document.frmMain.WSHPnum.disabled = true;
-				document.frmMain.MCnum.disabled = true;
-				if (document.frmMain.radiomed[0].checked == true) {
-					document.frmMain.MHPnum.disabled = false;
-					document.frmMain.NHHFnum.value = "";
-					document.frmMain.WSHPnum.value = "";
-					//document.frmMain.MCnum.value = "";
-					document.frmMain.MCnum.disabled = false;
-				}
-				if (document.frmMain.radiomed[1].checked == true) {
-					document.frmMain.NHHFnum.disabled = false;
-					document.frmMain.MHPnum.value = "";
-					document.frmMain.WSHPnum.value = "";
-					//document.frmMain.MCnum.value = "";
-					document.frmMain.MCnum.disabled = false;
-				}
-				if (document.frmMain.radiomed[2].checked == true) {
-					document.frmMain.WSHPnum.disabled = false;
-					document.frmMain.NHHFnum.value = "";
-					document.frmMain.MHPnum.value = "";
-					//document.frmMain.MCnum.value = "";
-					document.frmMain.MCnum.disabled = false;
-				}
-				if (document.frmMain.radiomed[3].checked == true) {
-					document.frmMain.MCnum.disabled = false;
-					document.frmMain.NHHFnum.value = "";
-					document.frmMain.WSHPnum.value = "";
-					document.frmMain.MHPnum.value = "";
-				}
-			}
-			function Chkdrg(tmpdept) {
-				if (document.frmMain.h_drg.value == "False") {
-					//document.frmMain.chkmed.checked = false;
-					document.frmMain.MCnum.value = "";
-					//document.frmMain.chkmed.disabled = true;
-					document.frmMain.MCnum.disabled = true;
-					document.frmMain.chkacc.disabled = true;
-					document.frmMain.chkcomp.disabled = true;
-					//document.frmMain.selIns.disabled = true;
-					document.frmMain.chkacc.checked = false;
-					document.frmMain.chkcomp.checked = false;
-					document.frmMain.btnSec.disabled = true;
-					document.frmMain.selIns.value = "";
-					document.frmMain.chkout.checked = false;
-					document.frmMain.chkout.disabled = true;
-				}
-				else {
-					document.frmMain.chkout.disabled = false;
-					document.frmMain.chkmed.disabled = false;
-					//document.frmMain.MCnum.disabled = false;
-					document.frmMain.chkacc.disabled = false;
-					document.frmMain.chkcomp.disabled = false;
-					//document.frmMain.selIns.disabled = false;
-					document.frmMain.btnSec.disabled = false;
-					OutPatient();
-					HasMedicaid(tmpdept);
-				}
-			}
-			function SaveMed(xxx) {
-				if (document.frmMain.h_drg.value == "True") {
-					if (document.frmMain.chkmed.checked == true) {
-						if (document.frmMain.txtDOB.value == "") {
-							alert("Please input client's date of birth.")
+				if (	Trim(ff.NHHFnum.value) == "" &&
+						ff.rdoMed_NHH.checked == true
+						) {
+					alert("Please input client's NH Healthy Families number.")
+					return;
+				} else {
+					if (Trim(ff.NHHFnum.value) != "") {
+						var chrmed = Trim(ff.NHHFnum.value);
+						if (chrmed.length != 11) {
+							alert("Invalid NH Healthy Families number length.")
 							return;
 						}
-						if (document.frmMain.radiomed[0].checked == false && document.frmMain.radiomed[1].checked == false && document.frmMain.radiomed[2].checked == false &&
-							document.frmMain.radiomed[3].checked == false) {
-							alert("Please select a Medicaid/MCO.")
-							return;
-						}
-						if (Trim(document.frmMain.MHPnum.value) == "" && document.frmMain.radiomed[0].checked == true) {
-							alert("Please input client's Meridian Health Plan number.")
-							return;
-						}
-						if (Trim(document.frmMain.NHHFnum.value) == "" && document.frmMain.radiomed[1].checked == true) {
-							alert("Please input client's NH Healthy Families number.")
-							return;
-						}
-						else {
-							if (Trim(document.frmMain.NHHFnum.value) != "") {
-								var chrmed = Trim(document.frmMain.NHHFnum.value);
-								if (chrmed.length != 11) {
-									alert("Invalid NH Healthy Families number length.")
-									return;
-								}
-							}
-						}
-						if (Trim(document.frmMain.WSHPnum.value) == "" && document.frmMain.radiomed[2].checked == true) {
-							alert("Please input client's Well Sense Health Plan number.")
-							return;
-						}
-						if (Trim(document.frmMain.MCnum.value) == "" && document.frmMain.radiomed[3].checked == true) {
-							alert("Please input client's Medicaid number.")
-							return;
-						}
-						else {
-							if (Trim(document.frmMain.MCnum.value) != "") {
-								var chrmed = Trim(document.frmMain.MCnum.value);
-								if (chrmed.length != 11) {
-									alert("Invalid Medicaid number length.")
-									return;
-								}
-							}
-						}
-						if (document.frmMain.chkawk.checked == false) {
-							alert("Acknowledge statement is required.")
-							return;
-						}
-					} 
-					document.frmMain.action = 'action.asp?ctrl=17&ID=' + xxx;
-					document.frmMain.submit();
+					}
 				}
-			}
-			function openSecIns() {
-				newwindow = window.open('secins.asp','name','height=800,width=400,scrollbars=1,directories=0,status=1,toolbar=0,resizable=0');
-				if (window.focus) {newwindow.focus()}
-			}
-			function chkleavemsg() {
-				if (document.frmMain.chkcall.checked == false) {
-					document.frmMain.chkleave.checked = false;
+				if (	Trim(ff.WSHPnum.value) == "" &&
+						ff.rdoMed_Wel.checked == true
+						) {
+					alert("Please input client's Well Sense Health Plan number.")
+					return;
 				}
-			}
-		<% end If %>
+				if (	Trim(ff.MCnum.value) == "" &&
+						ff.rdoMed_Med.checked == true
+						) {
+					alert("Please input client's Medicaid number.")
+					return;
+				} else {
+					if (Trim(ff.MCnum.value) != "") {
+						var chrmed = Trim(ff.MCnum.value);
+						if (chrmed.length != 11) {
+							alert("Invalid Medicaid number length.")
+							return;
+						}
+					}
+				}
+				if (ff.chkawk.checked == false) {
+					alert("Acknowledge statement is required.")
+					return;
+				}
+			} 
+			ff.action = 'action.asp?ctrl=17&ID=' + xxx;
+			ff.submit();
+		}
+	}
+
+	function openSecIns() {
+		newwindow = window.open('secins.asp','name','height=800,width=400,scrollbars=1,directories=0,status=1,toolbar=0,resizable=0');
+		if (window.focus) {newwindow.focus()}
+	}
+
+	function chkleavemsg() {
+		if (document.frmMain.chkcall.checked == false) {
+			document.frmMain.chkleave.checked = false;
+		}
+	}
+<% end If %>
 		//-->
 		</script>
 		</head>
@@ -1623,28 +1638,36 @@ End If
 											<tr>
 												<td align='right'></td>
 												<td colspan='3'>
-													<input type='radio' name='radiomed' <%=radiomed1%> value='1' onclick='SelPlan();'>
+													<input type='radio' id="rdoMed_Ame" name='radiomed' <%=radiomed5%> value='5' onclick='SelPlan();'>
+													AmeriHealth
+													<input type='text' class='main' maxlength='9' minlength="9" placeholder="AmeriHealth Member ID" name='AHMIdNum' id='AHMIdNum' value="<%=AHMIdNum%>"><br />
+
+													<input type='radio' id="rdoMed_Mer" name='radiomed' <%=radiomed1%> value='1' onclick='SelPlan();'>
 													Meridian Health Plan
-													<input type='text' class='main' maxlength='14' name='MHPnum' value="<%=MHPnum%>"><br>
-													<input type='radio' name='radiomed' <%=radiomed2%> value='2' onclick='SelPlan();'>
+													<input type='text' class='main' maxlength='14' name='MHPnum' value="<%=MHPnum%>"><br />
+
+													<input type='radio'  id="rdoMed_NHH" name='radiomed' <%=radiomed2%> value='2' onclick='SelPlan();'>
 													NH Healthy Families
-													<input type='text' class='main' maxlength='14' name='NHHFnum' value="<%=NHHFnum%>" onkeyup='bawalletters(this);'><br>
-													<input type='radio' name='radiomed' <%=radiomed3%> value='3' onclick='SelPlan();'>
+													<input type='text' class='main' maxlength='14' name='NHHFnum' value="<%=NHHFnum%>" onkeyup='bawalletters(this);'><br />
+
+													<input type='radio' id="rdoMed_Wel" name='radiomed' <%=radiomed3%> value='3' onclick='SelPlan();'>
 													Well Sense Health Plan
-													<input type='text' class='main' maxlength='14' name='WSHPnum' value="<%=WSHPnum%>"><span class='formatsmall' onmouseover="this.className='formatbig'" onmouseout="this.className='formatsmall'">(Well Sense number MUST contain NH (eg: NHXXXXXXX).)</span> <br>
-													<input type='radio' name='radiomed' <%=radiomed4%> value='4' onclick='SelPlan();'>
+													<input type='text' class='main' maxlength='14' name='WSHPnum' value="<%=WSHPnum%>"><span class='formatsmall' onmouseover="this.className='formatbig'" onmouseout="this.className='formatsmall'">(Well Sense number MUST contain NH (eg: NHXXXXXXX).)</span> <br />
+
+													<input type='radio' id="rdoMed_Med" name='radiomed' <%=radiomed4%> value='4' onclick='SelPlan();'>
 													Medicaid
-													
 													<span class='formatsmall' onmouseover="this.className='formatbig'" onmouseout="this.className='formatsmall'">(Directly Billed to Medicaid/Straight Medicaid/Non-MCO)</span> 
-													<br><br>
-													<span class='formatsmall' onmouseover="this.className='formatbig'" onmouseout="this.className='formatsmall'">*If MCO is disabled, LanguageBank does not a have contract with that MCO to directly enter an appointment through LanguageBank database.<br>
-														 Call LanguageBank for additional info</span>
-													<br><br>
+													<br />
+
+													<br />
+													<span class='formatsmall' onmouseover="this.className='formatbig'" onmouseout="this.className='formatsmall'">*If MCO is disabled, LanguageBank does not a have contract with that MCO to directly enter an appointment through LanguageBank database.<br />
+													Call LanguageBank for additional info</span>
+													<br /><br />
 													<input type='checkbox' name='chkawk' value='1' <%=chkawk%> >
-													Acknowledgement Statement:<br> 
-													- On behalf of my organization/institution, I/we agree to accept financial responsibility for this appointment and agree to pay Language Bank for interpretation services provided to us, if MCO or Medicaid declines to pay/cover this appointment.<br>
+													Acknowledgement Statement:<br /> 
+													- On behalf of my organization/institution, I/we agree to accept financial responsibility for this appointment and agree to pay Language Bank for interpretation services provided to us, if MCO or Medicaid declines to pay/cover this appointment.<br />
 													- I acknowledge that appointment entered is NOT Auto Accident or Workers Compensation case. On behalf of my organization/institution, I/we agree to reimburse/pay Language Bank if the state or MCO request repayment (if case is to be Auto Accident or Workers Compensation case), 
-													<br><br>
+													<br /><br />
 												</td>
 												<!--<td><input type='text' class='main' maxlength='14' name='MCnum' value="<%=MCNum%>"></td>//-->
 											</tr>

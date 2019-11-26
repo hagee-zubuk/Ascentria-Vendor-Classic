@@ -256,46 +256,6 @@ If Request("Clone") <> "" Then
 	rsClone.CLose
 	Set rsClone = Nothing
 End If
-'GET allowed mco
-Set rsInst = Server.CreateObject("ADODB.RecordSet")
-sqlInst = "SELECT * FROM mco_T"
-rsInst.Open sqlInst, g_strCONNLB, 3, 1
-If Not rsInst.EOF Then
-	Do Until rsInst.EOF 
-		If rsInst("mco") = "Medicaid" Then
-			If rsInst("active") Then
-				allowMCO = allowMCO & "document.frmMain.radiomed[3].disabled = false; " & vbCrLf 
-			Else
-				allowMCO = allowMCO & "document.frmMain.radiomed[3].disabled = true; " & vbCrLf 
-			End If
-		End If
-		If rsInst("mco") = "Meridian" Then
-			If rsInst("active") Then
-				allowMCO = allowMCO & "document.frmMain.radiomed[0].disabled = false; " & vbCrLf 
-			Else
-				allowMCO = allowMCO & "document.frmMain.radiomed[0].disabled = true; " & vbCrLf 
-			End If
-		End If
-		If rsInst("mco") = "NHhealth" Then
-			If rsInst("active") Then
-				allowMCO = allowMCO & "document.frmMain.radiomed[1].disabled = false; " & vbCrLf 
-			Else
-				allowMCO = allowMCO & "document.frmMain.radiomed[1].disabled = true; " & vbCrLf 
-			End If
-		End If
-		If rsInst("mco") = "WellSense" Then
-			If rsInst("active") Then
-				allowMCO = allowMCO & "document.frmMain.radiomed[2].disabled = false; " & vbCrLf 
-			Else
-				allowMCO = allowMCO & "document.frmMain.radiomed[2].disabled = true; " & vbCrLf 
-			End If
-		End If
-		rsInst.MoveNext
-	Loop
-End If
-rsInst.Close
-Set rsInst = Nothing
-'response.write "DEPT: " & tmpDept
 'GET INST V.2
 Set rsInst = Server.CreateObject("ADODB.RecordSet")
 sqlInst = "SELECT * FROM institution_T WHERE [index] = " & Session("InstID")

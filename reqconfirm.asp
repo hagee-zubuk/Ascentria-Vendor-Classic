@@ -160,6 +160,7 @@ If Not rsApp.EOF Then
 		tmpmer = rsApp("meridian")
 		tmpnh = rsApp("nhhealth")
 		tmpwell = rsApp("wellsense")
+		tmpame = rsApp("amerihealth")
 	End If
 	tmpLBCom = rsApp("lbcom")
 	tmpIntrCom = rsApp("intrcom")
@@ -464,6 +465,10 @@ End If
 									<tr>
 										<td align='right'><b>For Medicaid/MCO Billing:</b></td>
 										<td align='left'><b>----</b></td>
+									</tr>
+									<tr>
+										<td align='right'>AmeriHealth Member ID Number:</td>
+										<td class='confirm'><%=tmpAme%></td>
 									</tr>
 									<tr>
 										<td align='right'>Medicaid Number:</td>

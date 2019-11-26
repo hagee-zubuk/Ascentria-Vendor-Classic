@@ -59,7 +59,7 @@ End Function
 Function GetStatLB(myid)
 	GetStatLB = 0
 	Set rsDept = Server.CreateObject("ADODB.RecordSet")
-	sqlDept = " SELECT [status] FROM request_T WHERE [HPID] = " & myid
+	sqlDept = "SELECT [status] FROM request_T WHERE [HPID] = " & myid & " ORDER BY [timestamp] DESC"
 	rsDept.Open sqlDept, g_strCONNLB, 3, 1
 	If Not rsDept.EOF Then
 		GetStatLB = rsDept("status")
