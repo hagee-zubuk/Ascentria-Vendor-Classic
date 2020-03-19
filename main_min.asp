@@ -383,8 +383,8 @@ Set rsLang = Nothing
 		<script src="CalendarControl.js" language="javascript"></script>
 		<script src="main_helper.js" language="javascript"></script>
 		<script language='JavaScript'><!--
-function ReqChkMe(xxx) {	
-	if (document.frmMain.saveme.value == 'Save') {
+function ReqChkMe(xxx) {
+	if (document.frmMain.saveme.value == 'Save') {		
 		if (xxx == 2 || xxx == 3 || xxx == 4) {
 			alert("ERROR: You cannot edit canceled/missed appointments.");
 			return;

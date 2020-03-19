@@ -606,8 +606,9 @@ End If
 		textbox.value = str;
 	}
 
-	function ReqChkMe(xxx) {
+	function ReqChkMe(xxx) {	
 		if (document.frmMain.saveme.value == 'Save') {
+	
 			if (xxx == 2 || xxx == 3 || xxx == 4) {
 				alert("ERROR: You cannot edit canceled/missed appointments.")
 				return;
@@ -655,6 +656,10 @@ End If
 <% If Session("myClass") = 4 Or Session("myClass") = 6 Then %>
 			if (document.frmMain.mrrec.value == "") {
 				alert("ERROR: Please provide Patient MR#.")
+				return;
+			}
+			if (document.frmMain.txtCliCir.value == "") {
+				alert("ERROR: Please precaution information or \"N/A\".")
 				return;
 			}
 <% End If %>
@@ -779,8 +784,8 @@ End If
 					} else {
 						if (Trim(document.frmMain.AHMIdNum.value) != "") {
 							var chrmed = Trim(document.frmMain.AHMIdNum.value);
-							if (chrmed.length != 9) {
-								alert("Invalid AmeriHealth Member ID number length(9).")
+							if ((chrmed.length < 8) || (chrmed.length > 9)) {
+								alert("Invalid AmeriHealth Member ID number length(8/9).")
 								return;
 							}
 						}
