@@ -116,6 +116,18 @@ div.tabextern {
 				Document Translation Services</h1>
 			</div>
 		</div>
+		<div class="row border-top border-bottom " style="margin-bottom: 20px;">
+			<div class="col-md-2 offset-md-2 text-right bg-gradient-warning rounded-left text-dark">
+				<b><i>PLEASE NOTE:</i></b>
+			</div>
+			<div class="col-md-6 bg-gradient-warning rounded-right text-dark">
+				<p>As you may know, we are launching a new scheduling database in the near future. To prepare, we have emailed most of our current clients requesting that they complete a short survey in order to give them access to this new database.</p>
+				<p>If you have not already completed this survey, <a target="SURVEY"
+				href="https://www.surveymonkey.com/r/LB-DatabaseAccessSurvey">please submit your information here</a>
+				so we can provide you with access to the new database when it launches.</p>
+				<p>Thank you!</p>
+			</div>
+		</div>
 		<div class="row" >
 			<div class="col-md-4 offset-md-4">
 				<div class="err"><%=Session("MSG")%></div>
