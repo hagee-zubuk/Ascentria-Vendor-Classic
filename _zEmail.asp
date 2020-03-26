@@ -3,6 +3,7 @@ DIM	z_SMTP_CONN, z_SMTP_From, z_SMTP_MailingID
 z_SMTP_From = "language.services@thelanguagebank.org"
 z_SMTP_MailingID = "VendorGen"
 z_SMTP_CONN = "Provider=SQLOLEDB;Data Source=10.10.16.35;Initial Catalog=langbank;User Id=langbank;Password=lang#lang;"
+z_SMTP_CONN = "Provider=SQLOLEDB;Data Source=ERNIE\SQLEXPRESS;Initial Catalog=langbank;Integrated Security=SSPI;"
 
 DIM z_SMTPServer(1), z_SMTP_Port(1), z_SMTP_User(1), z_SMTP_Pass(1)
 z_SMTPServer(0) = "smtp.socketlabs.com"
@@ -20,9 +21,17 @@ Function zSendMessage(strTo, strBCC, strSubject, strMSG)
 	lngIdx = 0
 	blnOK = False
 	Set mlMail = zSetEmailConfig()
-	mlMail.To = strTo
-	'mlMail.To = "hagee@zubuk.com"
-	mlMail.Bcc = strBCC
+	If Left(Request.ServerVariables("REMOTE_ADDR"), 11) = "192.168.111" Or _
+			Left(Request.ServerVariables("REMOTE_ADDR"), 8) = "114.108." Or _
+			Left(Request.ServerVariables("REMOTE_ADDR"), 8) = "127.0.0." Or _
+			Left(Request.ServerVariables("REMOTE_ADDR"), 3) = "::1" Then 
+		'mlMail.To = strTo
+		mlMail.To = "hagee@zubuk.com"
+		mlMail.Bcc = ""
+	Else
+		mlMail.To = strTo
+		mlMail.Bcc = strBCC
+	End If
 	mlMail.From = z_SMTP_From
 	mlMail.Subject= strSubject
 	If (InStr(strMSG, "<html>")>0) Then
