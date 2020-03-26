@@ -341,13 +341,13 @@ If Not rsInst.EOF Then
 				allowMCO = allowMCO & "ff.rdoMed_Med.disabled = true; " & vbCrLf 
 			End If
 		End If
-		If rsInst("mco") = "AmeriHealth" Then
-			If rsInst("active") Then
-				allowMCO = allowMCO & "ff.rdoMed_Ame.disabled = false; " & vbCrLf 
-			Else
-				allowMCO = allowMCO & "ff.rdoMed_Ame.disabled = true; " & vbCrLf 
-			End If
-		End If
+		'If rsInst("mco") = "AmeriHealth" Then
+		''	If rsInst("active") Then
+		''		allowMCO = allowMCO & "ff.rdoMed_Ame.disabled = false; " & vbCrLf 
+		''	Else
+		''		allowMCO = allowMCO & "ff.rdoMed_Ame.disabled = true; " & vbCrLf 
+		''	End If
+		'End If
 		If rsInst("mco") = "Meridian" Then
 			If rsInst("active") Then
 				allowMCO = allowMCO & "ff.rdoMed_Mer.disabled = false; " & vbCrLf 
@@ -372,6 +372,7 @@ If Not rsInst.EOF Then
 		rsInst.MoveNext
 	Loop
 End If
+allowMCO = allowMCO & "ff.rdoMed_Ame.disabled = false; " & vbCrLf 
 rsInst.Close
 Set rsInst = Nothing
 'response.write "DEPT: " & tmpDept
