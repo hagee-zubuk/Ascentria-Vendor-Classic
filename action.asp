@@ -105,7 +105,7 @@ If Request("ctrl") = 1 Then 'save new appointment
 		Request("txtDOB") & "|" & Request("txtPDamount") & "|" & Request("h_tmpfilename") & "|" & Request("chkout") & "|" & Request("chkmed") & "|" & _
 		Request("MCnum") & "|" & Request("chkacc") & "|" & Request("chkcomp") & "|" & Request("selIns") & "|" & Request("txtemail") & "|" & _
 		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & _
-		Request("chkleave") & "|" & Request("txtCliCir") & "|" & Request("txtccaddr") & "|" & Request("AHMIdNum")	)
+		Request("chkleave") & "|" & Request("txtCliCir") & "|" & Request("txtccaddr") & "|" & Request("AHMIdNum") & "|" & Request("chkteleh") )
 	'CHECK VALID VALUES
 	If Session("myClass") <> 3 Then
 		If Request("txtTP") <> "" Then
@@ -243,6 +243,9 @@ If Request("ctrl") = 1 Then 'save new appointment
 		If tmpEntry(47) <> "" Then rsMain("acknowledge") = True
 		rsMain("autoacc") = False
 		If tmpEntry(40) <> "" Then rsMain("autoacc") = True
+		rsMain("telehealth") = FALSE
+		If rsMain("chkteleh") <> "" Then rsLB("telehealth") = TRUE
+
 		rsMain("wcomp") = False
 		If tmpEntry(41) <> "" Then rsMain("wcomp") = True
 		rsMain("secins") = Z_FixNull(tmpEntry(42))
@@ -347,8 +350,13 @@ If Request("ctrl") = 1 Then 'save new appointment
 		rsLB("nhhealth") = tmpEntry(45)
 		rsLB("wellsense") = tmpEntry(46)
 		rsLB("amerihealth") = tmpEntry(52)
+
 		rsLB("acknowledge") = false
 		If tmpEntry(47) <> "" Then rsLB("acknowledge") = True
+		
+		rsLB("telehealth") = FALSE
+		If Request("chkteleh") <> "" Then rsLB("telehealth") = TRUE
+
 		rsLB("autoacc") = False
 		If tmpEntry(40) <> "" Then rsLB("autoacc") = True
 		rsLB("wcomp") = False
@@ -728,7 +736,7 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		Request("txtDOB") & "|" & Request("txtPDamount") & "|" & Request("h_tmpfilename") & "|" & Request("chkout") & "|" & Request("chkmed") & "|" & _
 		Request("MCnum") & "|" & Request("chkacc") & "|" & Request("chkcomp") & "|" & Request("selIns") & "|" & Request("txtemail") & "|" & _
 		Request("MHPnum") & "|" & Request("NHHFnum") & "|" & Request("WSHPnum") & "|" & Request("chkawk")& "|" & Request("mrrec")& "|" & _
-		Request("chkleave") & "|" & Request("txtCliCir") & "|" & Request("AHMIdNum")	)
+		Request("chkleave") & "|" & Request("txtCliCir") & "|" & Request("AHMIdNum") & "|" & Request("chkteleh") )
 	'CHECK VALID VALUES
 	If Session("myClass") <> 3 Then
 		If Request("txtTP") <> "" Then
@@ -864,6 +872,9 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		rsMain("amerihealth") = tmpEntry(50)
 		rsMain("acknowledge") = false
 		If tmpEntry(46) <> "" Then rsMain("acknowledge") = True
+		rsMain("telehealth") = FALSE
+		If Request("chkteleh") <> "" Then rsMain("telehealth") = True 	' tmpEntry(51)
+
 		rsMain("autoacc") = False
 		If tmpEntry(39) <> "" Then rsMain("autoacc") = True
 		rsMain("wcomp") = False
@@ -879,7 +890,7 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		End If
 		rsMain.Close
 		Set rsMain = Nothing
-		If Session("type") = 5 AND FileUpload(tmpEntry(35)) Then 'save Form on DB
+		If Session("type") = 5 AND FileUpload(tmpEntry(35)) Then 		' save Form on DB
 			Set rsFile = Server.CreateObject("ADODB.RecordSet")
 			sqlFile = "SELECT * FROM pdf_T"
 			rsFile.Open sqlFile, g_strCONN, 1, 3
@@ -959,6 +970,10 @@ ElseIf Request("ctrl") = 3 Then 'edit appointment
 		rsLB("amerihealth") = tmpEntry(50)
 		rsLB("acknowledge") = false
 		If tmpEntry(46) <> "" Then rsLB("acknowledge") = True
+		' NEW for 2020-03-24 XXX '
+		rsLB("telehealth") = FALSE
+		If Request("chkteleh") <> "" Then rsLB("telehealth") = True 	' tmpEntry(51)
+		' ^^^^^^^^^^^^^^^^^^^^^^ '
 		rsLB("autoacc") = False
 		If tmpEntry(39) <> "" Then rsLB("autoacc") = True
 		rsLB("wcomp") = False

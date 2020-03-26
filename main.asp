@@ -23,7 +23,7 @@ radioLang2 = ""
 myStat = 0
 billedako = False
 Billedna = ""
-
+chkTeleh = ""
 'EDIT APPOINTMENT
 If Request("ID") <> "" Then
 	EditPage = " - Edit"
@@ -71,7 +71,8 @@ If Request("ID") <> "" Then
 		End If
 		tmpDOB = rsApp("DOB") 
 		chkUClientadd = ""
-		if rsApp("useCadr") = true then chkUClientadd = "checked"
+		If rsApp("useCadr") = true Then chkUClientadd = "checked"
+		If rsApp("telehealth") = TRUE Then chkTeleh = "CHECKED"
 		tmpCAdrI =  rsApp("capt")
 		tmpCAddr =  rsApp("caddress")
 		tmpCity = rsApp("ccity")
@@ -1668,7 +1669,15 @@ End If
 													<br />
 													<span class='formatsmall' onmouseover="this.className='formatbig'" onmouseout="this.className='formatsmall'">*If MCO is disabled, LanguageBank does not a have contract with that MCO to directly enter an appointment through LanguageBank database.<br />
 													Call LanguageBank for additional info</span>
+												
 													<br /><br />
+<!-- NEW for 2020-03-24 xxxxx -->
+<div style="display: inline-block; background-color: #fef; border-radius: 6px; width: 250px; padding: 5px 10px 8px 24px; border: 1px dotted #cbc; margin-bottom: 10px;">
+	<input type="checkbox" name="chkteleh" id="chkteleh" value="1" <%=chkTeleh%> style="padding-top: 3px;" />
+	This is a TELEHEALTH appointment
+</div>
+<!-- ^^^^^^^^^^^^^^^^^^^^^^^^ -->
+										<br /><br />
 													<input type='checkbox' name='chkawk' value='1' <%=chkawk%> >
 													Acknowledgement Statement:<br /> 
 													- On behalf of my organization/institution, I/we agree to accept financial responsibility for this appointment and agree to pay Language Bank for interpretation services provided to us, if MCO or Medicaid declines to pay/cover this appointment.<br />

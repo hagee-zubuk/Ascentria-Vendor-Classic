@@ -164,6 +164,10 @@ If Not rsApp.EOF Then
 	End If
 	tmpLBCom = rsApp("lbcom")
 	tmpIntrCom = rsApp("intrcom")
+	' NEW for 2020-03-24 XXX '
+	tmpTelehealth = "<img src=""images/nok.gif"" alt=""no"" title="""" />"
+	If rsApp("telehealth") = True Then tmpTelehealth = "<img src=""images/ok.gif"" alt=""YES"" title=""YES"" />"
+	' ^^^^^^^^^^^^^^^^^^^^^^ '
 	If rsApp("Gender") = vbNull Then
 		tmpSex = "Unknown"
 	Else
@@ -486,6 +490,14 @@ End If
 										<td align='right'>Well Sense Number:</td>
 										<td class='confirm'><%=tmpwell%></td>
 									</tr>
+									<tr><td>&nbsp;</td></tr>
+<!-- NEW for 2020-03-24 xxx -->
+<tr>
+	<td align='right'>Telehealth:</td>
+	<td class='confirm'><%=tmpTelehealth%></td>
+</tr>
+<tr><td>&nbsp;</td></tr>
+<!-- ^^^^^^^^^^^^^^^^^^^^^^ -->
 								<% Else %>
 									<tr>
 										<td align='right' width='25%' valign='top'>Court Room No:</td>
